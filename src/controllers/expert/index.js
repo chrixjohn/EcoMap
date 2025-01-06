@@ -1,3 +1,3 @@
-const {addNewExpert,loginexpert,getExpertDetails}=require('./expert');
+const {addNewExpert,loginexpert,getExpertDetails,forgotPassword,verifyOtp,resetPassword}=require('./expert');
 
-module.exports={addNewExpert,loginexpert,getExpertDetails}
+module.exports={addNewExpert,loginexpert,getExpertDetails,forgotPassword,verifyOtp,resetPassword}

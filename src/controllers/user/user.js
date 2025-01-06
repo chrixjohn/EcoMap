@@ -2,6 +2,9 @@
 const User = require('../../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Otp = require('../../models/otpModel');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 async function addNewUser(req, res) {
   const { name, email, password} = req.body;
@@ -41,6 +44,13 @@ async function getUserDetails(req, res) {
     .then(user => res.json(user))
     .catch(err => res.status(500).json({ message: 'Error fetching user details', error: err }));
 };
+
+
+
+
+
+
+
 
 
 
