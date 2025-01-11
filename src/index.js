@@ -8,7 +8,7 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 const mongoURI = process.env.MONGO_URI;
-console.log(mongoURI);
+
 
 
 app.use(logger);
@@ -18,8 +18,10 @@ app.use(cors());  // Middleware to parse JSON request body
 app.use('/user', userRoutes);
 app.use('/expert', expertRoutes);  // Use user routes under the '/api' path
 
-mongoose.connect(mongoURI,{useNewUrlParser: true,
-  useUnifiedTopology: true,})
+mongoose.connect(mongoURI
+  //,{useNewUrlParser: true,
+  //useUnifiedTopology: true,}
+)
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log('Error connecting to MongoDB:', err));
 
