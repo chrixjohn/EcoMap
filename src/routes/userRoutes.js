@@ -6,7 +6,7 @@ const {addNewUser,loginuser,getUserDetails,uploadImage} = require("../controller
 app.post("/register",addNewUser)
 app.post("/login",loginuser)
 app.get("/get-user",userauth,getUserDetails)
-app.get("/upload-image",uploadImage)
+app.post("/upload-image",userauth,uploadImage)
 
 
 

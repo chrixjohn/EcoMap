@@ -9,7 +9,11 @@ function userauth(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Use the secret from .env
+    console.log("decoded",decoded);
+    
     req.user = decoded; // Attach decoded user data to the request object
+    console.log("req.user",req.user);
+    
     next(); // Proceed to the next middleware or route handler
   } catch (error) {
     return res.status(403).json({ message: "Invalid token" });

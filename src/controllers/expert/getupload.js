@@ -24,4 +24,22 @@ const Upload=require("../../models/uploadModel")
     }
   }
 
-  module.exports={getUpload,getlistUpload}
+
+  async function getUploadById(req, res) {
+    const { id } = req.params;
+  
+    try {
+      const upload = await Upload.findById(id).populate('user', 'name email');
+      if (!upload) {
+        return res.status(404).json({ message: 'Upload not found' });
+      }
+      res.json(upload);
+    } catch (error) {
+      res.status(500).json({ message: 'Error retrieving upload details', error });
+    }
+  }
+  
+  
+  
+
+  module.exports={getUpload,getlistUpload,getUploadById}
