@@ -18,6 +18,10 @@ app.use(cors());  // Middleware to parse JSON request body
 app.use('/user', userRoutes);
 app.use('/expert', expertRoutes);  // Use user routes under the '/api' path
 
+app.get("/status", (req, res) => {
+  res.json({ alive: true });
+});
+
 mongoose.connect(mongoURI
   //,{useNewUrlParser: true,
   //useUnifiedTopology: true,}
