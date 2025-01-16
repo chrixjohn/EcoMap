@@ -10,17 +10,47 @@ const crypto = require('crypto');
 
 
 async function addNewExpert(req, res) {
-  const { name, email, password} = req.body;
+  const { name, email, password } = req.body;
+
+  // Validate inputs
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: 'All fields are required: name, email, and password.' });
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: 'Invalid email format.' });
+  }
+
+  // Validate password strength
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({
+      message: 'Password must be at least 8 characters long and include at least one letter and one number.',
+    });
+  }
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10); // Hash password
-    const newUser = new User({ name, email, password: hashedPassword});
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Check if email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email is already registered.' });
+    }
+
+    // Create and save the new user
+    const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
+
     res.status(201).json({ message: 'User registered successfully!' });
   } catch (error) {
     res.status(500).json({ message: 'Error registering user', error });
   }
-};
+}
+
 
 async function loginexpert(req, res) {
   const { email, password } = req.body;

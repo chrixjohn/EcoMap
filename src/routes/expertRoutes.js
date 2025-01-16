@@ -14,14 +14,14 @@ app.post('/forgot-password',forgotPassword)
 app.post('/verify-otp',verifyOtp)
 app.post('/reset-password', resetPassword);
 
-app.get("/get-upload",getUpload)
-app.get("/get-list-upload",getlistUpload)
-app.get("/get-upload-byid/:id",getUploadById)
+app.get("/get-upload",expertauth,getUpload)
+app.get("/get-list-upload",expertauth,getlistUpload)
+app.get("/get-upload-byid/:id",expertauth,getUploadById)
 
-app.post("/add-species",addSpecies)
-app.get("/get-species",getSpecies)
-app.post("/update-species/:id",updateSpecies)
-app.post("/delete-species/:id",deleteSpecies)
+app.post("/add-species",expertauth,addSpecies)
+app.get("/get-species",expertauth,getSpecies)
+app.post("/update-species/:id",expertauth,updateSpecies)
+app.post("/delete-species/:id",expertauth,deleteSpecies)
 
 app.post("/save-occurance",expertauth,saveOccurrence)
 app.post("/get-occurance/:id",expertauth,getOccurrenceById)
