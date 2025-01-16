@@ -45,6 +45,118 @@ async function getUserDetails(req, res) {
     .catch(err => res.status(500).json({ message: 'Error fetching user details', error: err }));
 };
 
+async function forgotPassword(req, res) {
+  try {
+    const { email } = req.body;
+
+    // Validate email input
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Generate OTP and expiration time
+    const otp = crypto.randomInt(100000, 999999); // 6-digit OTP
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+
+    // Save OTP in database
+    await Otp.create({ email, otp, expiresAt });
+    console.log(process.env.EMAIL_PASSWORD,process.env.EMAIL)
+
+    // Configure the mail transporter
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+        
+      },
+    });
+
+    // Email content
+    const mailOptions = {
+      from: `"Eco Map" <${process.env.EMAIL}>`,
+      to: email,
+      subject: 'EcoMap: Password Reset OTP',
+      html: `
+          <html>
+              <body style="font-family: Arial, sans-serif; background-color: #f4f7fc; padding: 20px;">
+                  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+                      <h2 style="color: #333333; text-align: center;">Eco Map - Password Reset</h2>
+                      <p style="font-size: 16px; color: #333333;">Hello User,</p>
+                      <p style="font-size: 16px; color: #333333;">We received a request to reset your password. Please use the following OTP to reset it:</p>
+                      <div style="text-align: center; margin: 20px 0;">
+                          <h3 style="font-size: 24px; color: white; background-color: #4CAF50; font-weight: bold; padding: 10px 30px; border-radius: 5px; display: inline-block; letter-spacing: 10px;">
+                              ${otp}
+                          </h3>
+                      </div>
+                      <p style="font-size: 16px; color: #333333;">The OTP is valid for <strong>10 minutes</strong>.</p>
+                      <p style="font-size: 16px; color: #333333;">If you didn't request a password reset, please ignore this email.</p>
+                      <div style="text-align: center; margin-top: 30px;">
+                          <p style="font-size: 14px; color: #888888;">&copy; 2025 Eco Map. All rights reserved.</p>
+                      </div>
+                  </div>
+              </body>
+          </html>
+      `,
+  };
+  
+  
+    // Send the email
+    const mail=await transporter.sendMail(mailOptions);
+    console.log(mail);
+    
+
+    // Respond with success message
+    res.status(200).json({ message: 'OTP sent to your email' });
+  } catch (error) {
+    console.error('Error in forgotPassword:', error);
+    res.status(500).json({ message: 'Error processing your request', error });
+  }
+}
+
+
+ async function verifyOtp (req, res) {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) return res.status(400).json({ message: 'Email and OTP are required' });
+
+  const record = await Otp.findOne({ email, otp });
+
+  if (!record || record.expiresAt < Date.now()) {
+    return res.status(400).json({ message: 'Invalid or expired OTP' });
+  }
+
+  // OTP verified, generate reset token
+  const resetToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '15m' });
+
+  res.status(200).json({ message: 'OTP verified', resetToken });
+};
+
+
+
+
+
+ async function resetPassword (req, res) {
+  const { resetToken, newPassword } = req.body;
+
+  if (!resetToken || !newPassword) return res.status(400).json({ message: 'Token and password are required' });
+
+  try {
+    const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
+    const email = decoded.email;
+
+    // Hash and update the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await User.updateOne({ email }, { password: hashedPassword });
+
+    res.status(200).json({ message: 'Password reset successful' });
+  } catch (error) {
+    res.status(403).json({ message: 'Invalid or expired token' });
+  }
+};
 
 
 
@@ -53,6 +165,5 @@ async function getUserDetails(req, res) {
 
 
 
-
-module.exports = {addNewUser,loginuser,getUserDetails};
+module.exports = {addNewUser,loginuser,getUserDetails,forgotPassword,verifyOtp,resetPassword};
 
