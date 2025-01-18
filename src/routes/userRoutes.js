@@ -1,6 +1,7 @@
 const express = require("express");
 const userauth = require("../middlewares/userauth");
 const app = express.Router();
+const upload = require("../config/multer");
 const {addNewUser,loginuser,getUserDetails,forgotPassword,verifyOtp,resetPassword,
     uploadImage} = require("../controllers/user");
 
@@ -12,7 +13,7 @@ app.post('/verify-otp',verifyOtp)
 app.post('/reset-password', resetPassword);
 
 
-app.post("/upload-image",userauth,uploadImage)
+app.post("/upload-image",userauth,upload.single('image'),uploadImage)
 
 
 
