@@ -14,7 +14,7 @@ const Upload=require("../../models/uploadModel")
   async function getlistUpload(req, res) {
     try {
       // Query and select only _id and image fields
-      const data = await Upload.find({}, 'image _id');  // Select only image and _id fields
+      const data = await Upload.find({}, 'image _id title');  // Select only image and _id fields
       
       // Send the selected data as JSON response
       res.json(data);

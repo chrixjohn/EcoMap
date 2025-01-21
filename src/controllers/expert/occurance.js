@@ -50,6 +50,22 @@ async function getOccurrenceById(req, res) {
       res.status(500).json({ message: 'Error retrieving occurrence details', error });
     }
   }
+  async function getOccurrence(req, res) {
+    
   
-  module.exports = {saveOccurrence, getOccurrenceById };
+    try {
+      const occurrence = await Occurrence.find()
+        .populate('spotId', 'image title description location status user date ')
+        
+      
+      if (!occurrence) {
+        return res.status(404).json({ message: 'Occurrence not found' });
+      }
+      res.json(occurrence);
+    } catch (error) {
+      res.status(500).json({ message: 'Error retrieving occurrence details', error });
+    }
+  }
+  
+  module.exports = {saveOccurrence, getOccurrenceById,getOccurrence };
   

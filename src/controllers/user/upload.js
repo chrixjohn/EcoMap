@@ -10,8 +10,20 @@ async function uploadImage(req, res) {
   const { title, description, location } = req.body;
 
   // Validate input
-  if (!req.file || !title || !description || !location) {
-    return res.status(400).json({ error: 'All fields are required' });
+  if (!req.file) {
+    return res.status(401).json({ error: 'File is required' });
+  }
+  
+  if (!title) {
+    return res.status(401).json({ error: 'Title is required' });
+  }
+  
+  if (!description) {
+    return res.status(401).json({ error: 'Description is required' });
+  }
+  
+  if (!location) {
+    return res.status(401).json({ error: 'Location is required' });
   }
 
   try {
@@ -78,7 +90,7 @@ async function uploadImage(req, res) {
 
 //   // Validate the input
 //   if (!req.file || !title || !description || !location) {
-//     return res.status(400).json({ error: 'All fields are required' });
+//     return res.status(401).json({ error: 'All fields are required' });
 //   }
 
 //   try {

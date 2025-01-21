@@ -8,7 +8,10 @@ const uploadSchema = new Schema({
   description: { type: String, required: true },
   date: { type: Date, default: Date.now },
   //photos: { type: [String], default: [] },
-  location: { type: String, required: true },
+  location: {
+    type: { type: String, default: 'Point' },
+    coordinates: [Number]
+  },
   status: { type: String, enum: ['approved', 'waiting'], default: 'waiting' },
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   

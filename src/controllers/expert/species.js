@@ -8,6 +8,22 @@ async function getSpecies(req, res) {
       res.status(500).json({ message: 'Error retrieving species', error });
     }
   }
+
+  async function getSpeciesById(req, res) {
+    try {
+      const speciesId = req.params.id;  // Get the species ID from the URL parameters
+      const species = await Species.findById(speciesId);  // Find the species by ID
+  
+      if (!species) {
+        return res.status(404).json({ message: 'Species not found' });
+      }
+  
+      res.json(species);  // Return the species if found
+    } catch (error) {
+      res.status(500).json({ message: 'Error retrieving species', error });
+    }
+  }
+  
   
   async function addSpecies(req, res) {
     const { common_name, scientific_name, taxonomy_class, conservation_status } = req.body;
@@ -61,6 +77,6 @@ async function getSpecies(req, res) {
     }
   }
   
-  module.exports = { getSpecies, addSpecies, updateSpecies, deleteSpecies };
+  module.exports = { getSpecies, addSpecies, updateSpecies, deleteSpecies,getSpeciesById };
   
   

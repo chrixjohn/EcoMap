@@ -10,20 +10,29 @@ async function addNewUser(req, res) {
   const { name, email, password } = req.body;
 
   // Validate inputs
-  if (!name || !email || !password) {
-    return res.status(400).json({ message: 'All fields are required: name, email, and password.' });
+  if (!name) {
+    return res.status(401).json({ message: 'Name is required.' });
   }
+  
+  if (!email) {
+    return res.status(401).json({ message: 'Email is required.' });
+  }
+  
+  if (!password) {
+    return res.status(401).json({ message: 'Password is required.' });
+  }
+  
 
   // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return res.status(400).json({ message: 'Invalid email format.' });
+    return res.status(401).json({ message: 'Invalid email format.' });
   }
 
   // Validate password strength
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/
   if (!passwordRegex.test(password)) {
-    return res.status(400).json({
+    return res.status(401).json({
       message: 'Password must be at least 8 characters long and include at least one letter and one number.',
     });
   }
@@ -35,7 +44,7 @@ async function addNewUser(req, res) {
     // Check if email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'Email is already registered.' });
+      return res.status(401).json({ message: 'Email is already registered.' });
     }
 
     // Create and save the new user
@@ -52,11 +61,19 @@ async function addNewUser(req, res) {
 async function loginuser(req, res) {
   const { email, password } = req.body;
   console.log(req.body);
+  
+  if (!email) {
+    return res.status(401).json({ message: 'Email is required.' });
+  }
+  
+  if (!password) {
+    return res.status(401).json({ message: 'Password is required.' });
+  }
 
   try {
     const user = await User.findOne({ email });
     
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(401).json({ message: 'User not found' });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
@@ -81,11 +98,11 @@ async function forgotPassword(req, res) {
 
     // Validate email input
     if (!email) {
-      return res.status(400).json({ message: 'Email is required' });
+      return res.status(401).json({ message: 'Email is required' });
     }
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(401).json({ message: 'User not found' });
 
     // Generate OTP and expiration time
     const otp = crypto.randomInt(100000, 999999); // 6-digit OTP
@@ -151,12 +168,12 @@ async function forgotPassword(req, res) {
  async function verifyOtp (req, res) {
   const { email, otp } = req.body;
 
-  if (!email || !otp) return res.status(400).json({ message: 'Email and OTP are required' });
+  if (!email || !otp) return res.status(401).json({ message: 'Email and OTP are required' });
 
   const record = await Otp.findOne({ email, otp });
 
   if (!record || record.expiresAt < Date.now()) {
-    return res.status(400).json({ message: 'Invalid or expired OTP' });
+    return res.status(401).json({ message: 'Invalid or expired OTP' });
   }
 
   // OTP verified, generate reset token
@@ -172,7 +189,7 @@ async function forgotPassword(req, res) {
  async function resetPassword (req, res) {
   const { resetToken, newPassword } = req.body;
 
-  if (!resetToken || !newPassword) return res.status(400).json({ message: 'Token and password are required' });
+  if (!resetToken || !newPassword) return res.status(401).json({ message: 'Token and password are required' });
 
   try {
     const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
