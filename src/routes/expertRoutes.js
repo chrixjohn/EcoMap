@@ -4,7 +4,8 @@ const app = express.Router();
 const {addNewExpert,loginexpert,getExpertDetails,forgotPassword,verifyOtp,resetPassword,
     getUpload,getlistUpload,getUploadById,
     addSpecies, getSpecies,getSpeciesById, updateSpecies, deleteSpecies,
-    saveOccurrence,getOccurrence,getOccurrenceById} = require("../controllers/expert");
+    saveOccurrence,getOccurrence,getOccurrenceById,
+    countAllDocuments} = require("../controllers/expert");
 
 
 app.post("/register",addNewExpert)
@@ -27,5 +28,7 @@ app.post("/delete-species/:id",expertauth,deleteSpecies)
 app.post("/save-occurance",expertauth,saveOccurrence)
 app.get("/get-occurance",getOccurrence)
 app.post("/get-occurance/:id",getOccurrenceById)
+
+app.get("/count",countAllDocuments)
 
 module.exports=app;

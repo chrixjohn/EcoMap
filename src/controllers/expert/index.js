@@ -6,7 +6,10 @@ const {addSpecies, getSpecies,getSpeciesById, updateSpecies, deleteSpecies } = r
 
 const {saveOccurrence,getOccurrence, getOccurrenceById} = require("./occurance")
 
+const {countAllDocuments} = require("./count")
+
 module.exports={addNewExpert,loginexpert,getExpertDetails,forgotPassword,verifyOtp,resetPassword,
     getUpload,getlistUpload,getUploadById,
     addSpecies, getSpecies, getSpeciesById, updateSpecies, deleteSpecies,
-    saveOccurrence,getOccurrence, getOccurrenceById };
+    saveOccurrence,getOccurrence, getOccurrenceById,
+    countAllDocuments};
