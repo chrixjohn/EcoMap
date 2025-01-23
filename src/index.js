@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require("cors");
-const {userRoutes,expertRoutes} = require('./routes');
+const {userRoutes,expertRoutes,adminRoutes} = require('./routes');
 const { logger } = require("./middlewares");
 require('dotenv').config();
 
@@ -17,6 +17,7 @@ app.use(cors());  // Middleware to parse JSON request body
 
 app.use('/user', userRoutes);
 app.use('/expert', expertRoutes);  // Use user routes under the '/api' path
+app.use('/admin', adminRoutes);
 
 app.get("/status", (req, res) => {
   res.json({ alive: true });

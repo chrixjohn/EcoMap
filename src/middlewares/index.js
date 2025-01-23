@@ -1,5 +1,5 @@
 const userauth = require("./userauth");
 const logger = require("./logger");
 const expertauth = require("./expertauth");
-
-module.exports = {  logger, userauth, expertauth };
+const admintauth = require("./adminauth");
+module.exports = {  logger, userauth, expertauth,admintauth };

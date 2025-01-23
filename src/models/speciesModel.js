@@ -5,6 +5,7 @@ const speciesSchema = new mongoose.Schema({
   scientific_name: { type: String, required: true },
   taxonomy_class: { type: String, default: null },
   conservation_status: { type: String, default: null },
+  image: { type: String, required: true },
 });
 
 const Species = mongoose.model('Species', speciesSchema);

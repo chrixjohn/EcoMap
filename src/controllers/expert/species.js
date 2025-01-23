@@ -1,3 +1,4 @@
+const cloudinary = require('../../config/cloudinary');
 const Species = require('../../models/speciesModel');
 
 async function getSpecies(req, res) {
@@ -25,17 +26,33 @@ async function getSpecies(req, res) {
   }
   
   
+  
   async function addSpecies(req, res) {
     const { common_name, scientific_name, taxonomy_class, conservation_status } = req.body;
-  
+    if (!req.file) {
+      return res.status(401).json({ error: 'File is required' });
+    }
+    try {
+
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'species' }, // Specify folder in Cloudinary
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      stream.end(req.file.buffer); // Pipe the buffer to Cloudinary
+    });
     const newSpecies = new Species({
       common_name,
       scientific_name,
       taxonomy_class,
       conservation_status,
+      image:result.secure_url
     });
   
-    try {
+    
       const savedSpecies = await newSpecies.save();
       res.status(201).json(savedSpecies);
     } catch (error) {
