@@ -6,7 +6,8 @@ const {addNewExpert,loginexpert,getExpertDetails,forgotPassword,verifyOtp,resetP
     getUpload,getlistUpload,getUploadById,
     addSpecies, getSpecies,getSpeciesById, updateSpecies, deleteSpecies,
     saveOccurrence,getOccurrence,getOccurrenceById,
-    countAllDocuments} = require("../controllers/expert");
+    countAllDocuments,
+    searchSpecies, filterByConservationStatus, sortSpecies} = require("../controllers/expert");
 
 
 app.post("/register",addNewExpert)
@@ -31,5 +32,9 @@ app.get("/get-occurance",getOccurrence)
 app.get("/get-occurance/:id",getOccurrenceById)
 
 app.get("/count",countAllDocuments)
+
+app.post("/search-species",searchSpecies)
+app.post("/filter-conservationstatus",filterByConservationStatus)
+app.post("/sort-species",sortSpecies)
 
 module.exports=app;

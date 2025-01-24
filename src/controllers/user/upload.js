@@ -7,7 +7,11 @@ const fs = require('fs'); // To remove files after upload
 
 
 async function uploadImage(req, res) {
-  const { title, description, location } = req.body;
+  const { title, description } = req.body;
+  const location = {
+  type: req.body['location.type'],
+  coordinates: req.body['location.coordinates'].map(Number), // Convert to numbers
+};
 
   // Validate input
   if (!req.file) {
@@ -22,9 +26,7 @@ async function uploadImage(req, res) {
     return res.status(401).json({ error: 'Description is required' });
   }
   
-  if (!location) {
-    return res.status(401).json({ error: 'Location is required' });
-  }
+  
 
   try {
     const user = req.user; // Retrieved from middleware
@@ -53,14 +55,15 @@ async function uploadImage(req, res) {
       user: user.id,
     });
 
+    console.log("newUpload",newUpload);
     await newUpload.save();
 
-    const uploads = await Upload.find({ user: user.id }).populate('user', 'name email');
+    // const uploads = await Upload.find({ user: user.id }).populate('user', 'name email');
 
     res.status(201).json({
       message: 'Image uploaded successfully!',
       upload: newUpload,
-      uploads,
+      
     });
   } catch (error) {
     console.error(error);
@@ -138,11 +141,23 @@ async function uploadImage(req, res) {
 // }
 
 
+async function getUserUploads(req, res) {
+    const user = req.user; // Retrieved from middleware
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
+  
+    try {
+      const uploads = await Upload.find({ user: user.id });
+      res.status(200).json(uploads);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch uploads.' });
+    }
+  }
 
 
 
-
-module.exports = { uploadImage };
+module.exports = { uploadImage,getUserUploads };
 
 
 

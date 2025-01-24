@@ -13,10 +13,10 @@ const Upload=require("../../models/uploadModel")
 
   async function getlistUpload(req, res) {
     try {
-      // Query and select only _id and image fields
-      const data = await Upload.find({}, 'image _id title');  // Select only image and _id fields
-      
-      // Send the selected data as JSON response
+      // Query where status is 'waiting' and select specific fields
+      const data = await Upload.find({ status: 'waiting' }, 'image _id title');
+  
+      // Send the filtered data as JSON response
       res.json(data);
     } catch (err) {
       // Handle errors and send error response
@@ -30,6 +30,8 @@ const Upload=require("../../models/uploadModel")
   
     try {
       const upload = await Upload.findById(id).populate('user', 'name email');
+      console.log('JOS',upload);
+      
       if (!upload) {
         return res.status(404).json({ message: 'Upload not found' });
       }

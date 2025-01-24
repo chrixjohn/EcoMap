@@ -12,7 +12,8 @@ const occurrenceSchema = new mongoose.Schema({
   //location: { type: String, required: true },
   expertId: { type: mongoose.Schema.Types.ObjectId, ref: 'Expert', default: null },
   //expertname: { type: String, default: null },
-});
+},
+{timestamps: true});
 
 const Occurrence = mongoose.model('Occurrence', occurrenceSchema);
 module.exports = Occurrence;

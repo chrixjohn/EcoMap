@@ -1,4 +1,5 @@
 const {addNewUser,loginuser,getUserDetails,forgotPassword,verifyOtp,resetPassword}=require('./user');
-const{uploadImage}=require("./upload")
+const{uploadImage,getUserUploads}=require("./upload")
 
-module.exports={addNewUser,loginuser,getUserDetails,uploadImage,forgotPassword,verifyOtp,resetPassword};
+module.exports={addNewUser,loginuser,getUserDetails,forgotPassword,verifyOtp,resetPassword,
+    uploadImage,getUserUploads};

@@ -37,8 +37,8 @@ async function getOccurrenceById(req, res) {
   
     try {
       const occurrence = await Occurrence.findById(id)
-        .populate('spotId', 'title description location status user date ')
-        .populate('speciesId', 'common_name scientific_name taxonomy_class conservation_status')
+        .populate('spotId')
+        .populate('speciesId')
         .populate('userId', 'name email')
         .populate('expertId', 'name email');
       

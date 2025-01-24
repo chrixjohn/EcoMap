@@ -8,8 +8,11 @@ const {saveOccurrence,getOccurrence, getOccurrenceById} = require("./occurance")
 
 const {countAllDocuments} = require("./count")
 
+const { searchSpecies, filterByConservationStatus, sortSpecies } = require("./filter")
+
 module.exports={addNewExpert,loginexpert,getExpertDetails,forgotPassword,verifyOtp,resetPassword,
     getUpload,getlistUpload,getUploadById,
     addSpecies, getSpecies, getSpeciesById, updateSpecies, deleteSpecies,
     saveOccurrence,getOccurrence, getOccurrenceById,
-    countAllDocuments};
+    countAllDocuments,
+    searchSpecies, filterByConservationStatus, sortSpecies};

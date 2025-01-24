@@ -87,10 +87,17 @@ async function loginuser(req, res) {
 };
 
 async function getUserDetails(req, res) {
-  User.findById(req.user.id)
-    .then(user => res.json(user))
-    .catch(err => res.status(500).json({ message: 'Error fetching user details', error: err }));
-};
+  try {
+    const user = await User.findById(req.user.id).select('name email');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching user details', error: err.message });
+  }
+}
+
 
 async function forgotPassword(req, res) {
   try {

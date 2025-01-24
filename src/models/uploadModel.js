@@ -13,7 +13,7 @@ const uploadSchema = new Schema({
     coordinates: [Number]
   },
   status: { type: String, enum: ['approved', 'waiting'], default: 'waiting' },
-  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   
 });
 
