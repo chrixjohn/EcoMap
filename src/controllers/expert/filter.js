@@ -1,4 +1,5 @@
 const Species = require('../../models/speciesModel');
+const Occurrence = require('../../models/occurenceModel');
 
 async function searchSpecies(req, res) {
     try {
@@ -61,4 +62,92 @@ async function searchSpecies(req, res) {
     }
   };
 
-  module.exports = { searchSpecies, filterByConservationStatus, sortSpecies };
+  async function filterSpecies(req, res) {
+    try {
+      const { searchTerm, conservationStatus, sort } = req.query;
+  
+      const query = {};
+      const sortOption = {};
+  
+      // Add searchTerm to the query if provided
+      if (searchTerm) {
+        query.common_name = { $regex: searchTerm, $options: "i" }; // Case-insensitive substring match
+      }
+  
+      // Add conservationStatus to the query if provided
+      if (conservationStatus) {
+        query.conservation_status = conservationStatus;
+      }
+  
+      // Add sort option if provided
+      if (sort === "asc") {
+        sortOption.common_name = 1; // A-Z
+      } else if (sort === "desc") {
+        sortOption.common_name = -1; // Z-A
+      }
+  
+      // Fetch species based on the query and sort options
+      const species = await Species.find(query).sort(sortOption);
+  
+      if (species.length === 0) {
+        return res.status(404).json({ message: "No species found matching the criteria." });
+      }
+  
+      res.status(200).json(species);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+
+
+async function filterOccurrences(req, res) {
+  try {
+    const { searchTerm, startDate, endDate, sort } = req.query;
+
+    if (!searchTerm && !startDate && !endDate && !sort) {
+      return res.status(400).json({ message: "Please provide a search term, start date, end date, or sort option." });
+    }
+
+    const query = {};
+
+    // Add date range filter if startDate and/or endDate are provided
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate); // Greater than or equal to startDate
+      if (endDate) query.createdAt.$lte = new Date(endDate); // Less than or equal to endDate
+    }
+
+    // Determine sorting option
+    const sortOption = {};
+    if (sort === "recent") {
+      sortOption.createdAt = -1; // Sort by most recently added
+    } else if (sort === "oldest") {
+      sortOption.createdAt = 1; // Sort by oldest first
+    }
+
+    // Fetch occurrences and populate the 'spotId' reference
+    const occurrences = await Occurrence.find(query)
+      .populate({
+        path: 'spotId', // Populate the 'spotId' reference
+        select: 'title', // Only fetch the 'title' field
+        match: searchTerm ? { title: { $regex: searchTerm, $options: 'i' } } : null // Match 'title' if searchTerm is provided
+      })
+      .sort(sortOption) // Apply sorting
+      .exec();
+
+    // Filter out occurrences where the populated spotId is null (no match in the title)
+    const filteredOccurrences = occurrences.filter(o => o.spotId !== null);
+
+    if (filteredOccurrences.length === 0) {
+      return res.status(404).json({ message: "No occurrences found matching the criteria." });
+    }
+
+    res.status(200).json(filteredOccurrences);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+
+
+  module.exports = { searchSpecies, filterByConservationStatus, sortSpecies, filterSpecies, filterOccurrences };

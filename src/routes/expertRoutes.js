@@ -7,7 +7,8 @@ const {addNewExpert,loginexpert,getExpertDetails,forgotPassword,verifyOtp,resetP
     addSpecies, getSpecies,getSpeciesById, updateSpecies, deleteSpecies,
     saveOccurrence,getOccurrence,getOccurrenceById,
     countAllDocuments,
-    searchSpecies, filterByConservationStatus, sortSpecies} = require("../controllers/expert");
+    searchSpecies, filterByConservationStatus, sortSpecies, filterSpecies,filterOccurrences,
+    getGeoJSONData} = require("../controllers/expert");
 
 
 app.post("/register",addNewExpert)
@@ -33,8 +34,12 @@ app.get("/get-occurance/:id",getOccurrenceById)
 
 app.get("/count",countAllDocuments)
 
-app.post("/search-species",searchSpecies)
-app.post("/filter-conservationstatus",filterByConservationStatus)
-app.post("/sort-species",sortSpecies)
+app.get("/search-species",searchSpecies)
+app.get("/filter-conservationstatus",filterByConservationStatus)
+app.get("/sort-species",sortSpecies)
+app.get("/filter-species",filterSpecies)
+app.get("/filter-occurrences",filterOccurrences)
+
+app.get("/map",getGeoJSONData);
 
 module.exports=app;

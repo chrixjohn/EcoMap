@@ -7,6 +7,9 @@ async function saveOccurrence(req, res) {
   
     try {
         const user = req.user;
+        console.log("user",user);
+        
+        
         if (!user) {
             return res.status(401).json({ error: 'Unauthorized.' });
         }
@@ -17,7 +20,7 @@ async function saveOccurrence(req, res) {
         
         userId,
         
-        expertId:user._id,
+        expertId:user.id,
         
       });
   
@@ -55,7 +58,7 @@ async function getOccurrenceById(req, res) {
   
     try {
       const occurrence = await Occurrence.find()
-        .populate('spotId', 'image title description location status user date ')
+        .populate('spotId')
         
       
       if (!occurrence) {
