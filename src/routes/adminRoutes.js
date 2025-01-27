@@ -1,8 +1,15 @@
 const express = require("express");
 const adminauth = require("../middlewares/adminauth");
-
 const app = express.Router();
-const {getExperts,getUsers} = require("../controllers/admin");
+const {getExperts,getUsers,
+    addNewAdmin,loginAdmin,getAdminDetails,forgotPassword,verifyOtp,resetPassword} = require("../controllers/admin");
+
+app.post("/register",addNewAdmin)
+app.post("/login",loginAdmin)
+app.get("/get-user",adminauth,getAdminDetails)
+app.post('/forgot-password',forgotPassword)
+app.post('/verify-otp',verifyOtp)
+app.post('/reset-password', resetPassword);
 
 app.get("/experts",adminauth,getExperts)
 app.get("/users",adminauth,getUsers)

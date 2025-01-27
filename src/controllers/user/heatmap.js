@@ -14,7 +14,7 @@ async function getGeoJSONData(req, res) {
       if (!occurrences || occurrences.length === 0) {
         return res.status(404).json({ error: 'No occurrences found' });
       }
-      console.log(occurrences);
+ 
       
       // Format data as GeoJSON FeatureCollection
       const geoJSON = {

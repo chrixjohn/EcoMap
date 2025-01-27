@@ -8,7 +8,7 @@ const {addNewExpert,loginexpert,getExpertDetails,forgotPassword,verifyOtp,resetP
     saveOccurrence,getOccurrence,getOccurrenceById,
     countAllDocuments,
     searchSpecies, filterByConservationStatus, sortSpecies, filterSpecies,filterOccurrences,
-    getGeoJSONData} = require("../controllers/expert");
+    getGeoJSONData,speciesMap} = require("../controllers/expert");
 
 
 app.post("/register",addNewExpert)
@@ -41,5 +41,6 @@ app.get("/filter-species",filterSpecies)
 app.get("/filter-occurrences",filterOccurrences)
 
 app.get("/map",getGeoJSONData);
+app.get("/species-map/:id",speciesMap);
 
 module.exports=app;

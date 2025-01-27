@@ -15,7 +15,6 @@ const countAllDocuments = async (req, res) => {
         // Iterate through models to count documents
         for (const [key, model] of Object.entries(models)) {
             try {
-                console.log(`Counting documents for: ${key}`);
                 counts[key] = await model.countDocuments();
                 
             } catch (error) {

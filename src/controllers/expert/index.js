@@ -4,7 +4,7 @@ const {addSpecies, getSpecies,getSpeciesById, updateSpecies, deleteSpecies } = r
 const {saveOccurrence,getOccurrence, getOccurrenceById} = require("./occurance")
 const {countAllDocuments} = require("./count")
 const { searchSpecies, filterByConservationStatus, sortSpecies, filterSpecies,filterOccurrences } = require("./filter")
-const {getGeoJSONData} = require("./heatmap")
+const {getGeoJSONData,speciesMap} = require("./heatmap")
 
 module.exports={addNewExpert,loginexpert,getExpertDetails,forgotPassword,verifyOtp,resetPassword,
     getUpload,getlistUpload,getUploadById,
@@ -12,4 +12,4 @@ module.exports={addNewExpert,loginexpert,getExpertDetails,forgotPassword,verifyO
     saveOccurrence,getOccurrence, getOccurrenceById,
     countAllDocuments,
     searchSpecies, filterByConservationStatus, sortSpecies, filterSpecies,filterOccurrences,
-    getGeoJSONData};
+    getGeoJSONData,speciesMap};

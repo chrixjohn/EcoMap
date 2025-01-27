@@ -55,7 +55,6 @@ async function uploadImage(req, res) {
       user: user.id,
     });
 
-    console.log("newUpload",newUpload);
     await newUpload.save();
 
     // const uploads = await Upload.find({ user: user.id }).populate('user', 'name email');

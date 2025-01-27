@@ -30,7 +30,6 @@ const Upload=require("../../models/uploadModel")
   
     try {
       const upload = await Upload.findById(id).populate('user', 'name email');
-      console.log('JOS',upload);
       
       if (!upload) {
         return res.status(404).json({ message: 'Upload not found' });
