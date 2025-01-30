@@ -2,13 +2,38 @@ const cloudinary = require('../../config/cloudinary');
 const Species = require('../../models/speciesModel');
 
 async function getSpecies(req, res) {
-    try {
-      const species = await Species.find();
-      res.json(species);
-    } catch (error) {
-      res.status(500).json({ message: 'Error retrieving species', error });
-    }
+  try {
+      const { searchTerm, conservationStatus, sortBy } = req.query;
+      const query = {};
+      const sortOption = {};
+
+      if (searchTerm) {
+          query.common_name = { $regex: searchTerm, $options: "i" };
+      }
+
+      if (conservationStatus) {
+          query.conservation_status = conservationStatus;
+      }
+
+      if (sortBy === "asc") {
+          sortOption.common_name = 1; // A-Z
+      } else if (sortBy === "desc") {
+          sortOption.common_name = -1; // Z-A
+      }
+
+      const species = await Species.find(query).sort(sortOption);
+
+      if (species.length === 0) {
+          return res
+              .status(200)
+              .json({ message: "No species found matching the criteria." });
+      }
+
+      res.status(200).json(species);
+  } catch (error) {
+      res.status(500).json({ message: "Error retrieving species", error });
   }
+}
 
   async function getSpeciesById(req, res) {
     try {

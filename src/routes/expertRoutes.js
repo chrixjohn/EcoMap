@@ -7,7 +7,6 @@ const {addNewExpert,loginexpert,getExpertDetails,forgotPassword,verifyOtp,resetP
     addSpecies, getSpecies,getSpeciesById, updateSpecies, deleteSpecies,
     saveOccurrence,getOccurrence,getOccurrenceById,
     countAllDocuments,
-    searchSpecies, filterByConservationStatus, sortSpecies, filterSpecies,filterOccurrences,
     getGeoJSONData,speciesMap} = require("../controllers/expert");
 
 
@@ -33,12 +32,6 @@ app.get("/get-occurance",getOccurrence)
 app.get("/get-occurance/:id",getOccurrenceById)
 
 app.get("/count",countAllDocuments)
-
-app.get("/search-species",searchSpecies)
-app.get("/filter-conservationstatus",filterByConservationStatus)
-app.get("/sort-species",sortSpecies)
-app.get("/filter-species",filterSpecies)
-app.get("/filter-occurrences",filterOccurrences)
 
 app.get("/map",getGeoJSONData);
 app.get("/species-map/:id",speciesMap);

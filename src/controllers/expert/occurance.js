@@ -54,21 +54,56 @@ async function getOccurrenceById(req, res) {
     }
   }
   async function getOccurrence(req, res) {
-    
-  
     try {
-      const occurrence = await Occurrence.find()
-        .populate('spotId')
-        
-      
-      if (!occurrence) {
-        return res.status(404).json({ message: 'Occurrence not found' });
-      }
-      res.json(occurrence);
+        const { searchTerm, startDate, endDate, sortBy } = req.query;
+        const query = {};
+
+        if (startDate || endDate) {
+            query.createdAt = {};
+            if (startDate) query.createdAt.$gte = new Date(startDate);
+            if (endDate) query.createdAt.$lte = new Date(endDate);
+        }
+
+        const sortOption = {};
+        if (sortBy == "recent") {
+            sortOption.createdAt = -1;
+        } else if (sortBy == "oldest") {
+            sortOption.createdAt = 1;
+        }
+
+        const occurrences = await Occurrence.find(query)
+            .populate({
+                path: "spotId",
+                select: "image",
+            })
+            .populate({
+                path: "speciesId",
+                select: "common_name",
+                match: searchTerm
+                    ? { common_name: { $regex: searchTerm, $options: "i" } }
+                    : null,
+            })
+            .sort(sortOption)
+            .exec();
+
+        const filteredOccurrences = occurrences.filter(
+            (o) => o.speciesId !== null
+        );
+
+        if (filteredOccurrences.length === 0) {
+            return res.status(200).json({
+                message: "No occurrences found matching the criteria.",
+            });
+        }
+
+        res.status(200).json(filteredOccurrences);
     } catch (error) {
-      res.status(500).json({ message: 'Error retrieving occurrence details', error });
+        res.status(500).json({
+            message: "Error retrieving occurrence details",
+            error,
+        });
     }
-  }
+}
   
   module.exports = {saveOccurrence, getOccurrenceById,getOccurrence };
   

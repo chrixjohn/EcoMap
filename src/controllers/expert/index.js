@@ -3,7 +3,6 @@ const {getUpload,getlistUpload,getUploadById} = require('./getupload');
 const {addSpecies, getSpecies,getSpeciesById, updateSpecies, deleteSpecies } = require('./species');
 const {saveOccurrence,getOccurrence, getOccurrenceById} = require("./occurance")
 const {countAllDocuments} = require("./count")
-const { searchSpecies, filterByConservationStatus, sortSpecies, filterSpecies,filterOccurrences } = require("./filter")
 const {getGeoJSONData,speciesMap} = require("./heatmap")
 
 module.exports={addNewExpert,loginexpert,getExpertDetails,forgotPassword,verifyOtp,resetPassword,
@@ -11,5 +10,4 @@ module.exports={addNewExpert,loginexpert,getExpertDetails,forgotPassword,verifyO
     addSpecies, getSpecies, getSpeciesById, updateSpecies, deleteSpecies,
     saveOccurrence,getOccurrence, getOccurrenceById,
     countAllDocuments,
-    searchSpecies, filterByConservationStatus, sortSpecies, filterSpecies,filterOccurrences,
     getGeoJSONData,speciesMap};
