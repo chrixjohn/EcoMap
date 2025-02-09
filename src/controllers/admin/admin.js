@@ -122,7 +122,7 @@ async function forgotPassword(req, res) {
               <body style="font-family: Arial, sans-serif; background-color: #f4f7fc; padding: 20px;">
                   <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
                       <h2 style="color: #333333; text-align: center;">Eco Map - Password Reset</h2>
-                      <p style="font-size: 16px; color: #333333;">Hello Expert,</p>
+                      <p style="font-size: 16px; color: #333333;">Hello Admin,</p>
                       <p style="font-size: 16px; color: #333333;">We received a request to reset your password. Please use the following OTP to reset it:</p>
                       <div style="text-align: center; margin: 20px 0;">
                           <h3 style="font-size: 24px; color: white; background-color: #4CAF50; font-weight: bold; padding: 10px 30px; border-radius: 5px; display: inline-block; letter-spacing: 10px;">

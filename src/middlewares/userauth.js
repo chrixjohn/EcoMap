@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-
-function userauth(req, res, next) {
+const User = require("../models/userModel");
+async function userauth(req, res, next) {
   const token = req.headers["x-authtoken"];
 
   if (!token) {
@@ -9,11 +9,11 @@ function userauth(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Use the secret from .env
-    console.log("decoded",decoded);
-    
+    const user = await User.findOne({ _id: decoded.id });
+    if (!user) {
+      return res.status(401).json({ message: "User not found please register" });
+    }
     req.user = decoded; // Attach decoded user data to the request object
-    console.log("req.user",req.user);
-    
     next(); // Proceed to the next middleware or route handler
   } catch (error) {
     return res.status(403).json({ message: "Invalid token" });
