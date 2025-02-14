@@ -71,22 +71,6 @@ async function uploadImage(req, res) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // async function uploadImage(req, res) {
 //   const { title, description, location } = req.body;
 
@@ -155,8 +139,65 @@ async function getUserUploads(req, res) {
   }
 
 
+  async function getUploadHistory(req, res) {
+    try {
+        const userId = req.user.id;
+        const uploads = await Upload.find({ user: userId, status: { $in: ['approved', 'declined'] } });
+        
+        const formattedUploads = uploads.map(upload => ({
+            uploadID: upload._id,
+            status: upload.status,
+            name: upload.title,
+            date: upload.date
+        }));
 
-module.exports = { uploadImage,getUserUploads };
+        res.json(formattedUploads);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+// Get pending uploads
+async function getPendingList(req, res) {
+    try {
+        const userId = req.user.id;
+        const uploads = await Upload.find({ user: userId, status: 'waiting' });
+        
+        const pendingUploads = uploads.map(upload => ({
+            uploadID: upload._id,
+            name: upload.title,
+            date: upload.date
+        }));
+
+        res.json(pendingUploads);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+// Get full data of a pending upload
+async function getPendingData(req, res) {
+    try {
+        const { uploadID } = req.body;
+        const upload = await Upload.findById(uploadID);
+
+        if (!upload) {
+            return res.status(404).json({ error: 'Upload not found' });
+        }
+
+        res.json({
+            uploadID: upload._id,
+            image: upload.image,
+            date: upload.date,
+            location: upload.location
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+
+module.exports = { uploadImage,getUserUploads,getUploadHistory,getPendingList,getPendingData };
 
 
 
