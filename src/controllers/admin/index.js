@@ -1,5 +1,9 @@
-const {getExperts} = require("./experts")
-const {getUsers} = require("./users")
-const {addNewAdmin,loginAdmin,getAdminDetails,forgotPassword,verifyOtp,resetPassword} = require("./admin")
+const {addNewAdmin, loginAdmin, getAdminDetails, updateAdmin, deleteAdmin, forgotPassword, verifyOtp, resetPassword} = require("./admin")
+const {getExperts, updateExpert, deleteExpert} = require("./experts")
+const {getUsers, updateUser, deleteUser} = require("./users")
+const {species, updateSpecies,  deleteSpecies} = require("./species")
 
-module.exports={getExperts,getUsers,addNewAdmin,loginAdmin,getAdminDetails,forgotPassword,verifyOtp,resetPassword}
+module.exports={addNewAdmin, loginAdmin, getAdminDetails, updateAdmin, deleteAdmin, forgotPassword, verifyOtp, resetPassword, 
+    getExperts, updateExpert, deleteExpert, 
+    getUsers, updateUser, deleteUser, 
+    species, updateSpecies,  deleteSpecies};

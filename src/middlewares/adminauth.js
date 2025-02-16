@@ -10,7 +10,10 @@ async function adminauth(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Use the secret from .env
-    const admin = await Admin.findOne({ _id: decoded.id });
+    const admin = await Admin.findById(decoded.id);
+    if (decoded.role != "admin") {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     if (!admin) {
       return res.status(401).json({ message: "Admin not found please register" });
     }

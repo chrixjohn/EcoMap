@@ -9,7 +9,10 @@ async function userauth(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Use the secret from .env
-    const user = await User.findOne({ _id: decoded.id });
+    const user = await User.findById(decoded.id);
+    if (decoded.role != "user") {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     if (!user) {
       return res.status(401).json({ message: "User not found please register" });
     }

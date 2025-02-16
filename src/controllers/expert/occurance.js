@@ -1,40 +1,6 @@
 const Occurrence = require("../../models/occurenceModel")
 const Upload = require("../../models/uploadModel")
 
-
-async function saveOccurrence(req, res) {
-    const { spotId,  speciesId, userId } = req.body;
-  
-    try {
-        const user = req.user;
-        console.log("user",user);
-        
-        
-        if (!user) {
-            return res.status(401).json({ error: 'Unauthorized.' });
-        }
-      const newOccurrence = new Occurrence({
-        spotId,
-        
-        speciesId,
-        
-        userId,
-        
-        expertId:user.id,
-        
-      });
-  
-      await newOccurrence.save();
-      await Upload.findByIdAndUpdate(spotId, { status: 'approved' });
-      res.status(201).json({ message: 'Occurrence saved successfully', occurrence: newOccurrence });
-    } catch (error) {
-      res.status(500).json({ message: 'Error saving occurrence', error });
-    }
-  }
-  
-  module.exports = { saveOccurrence };
-  
-
 async function getOccurrenceById(req, res) {
     const { id } = req.params;
   
@@ -104,6 +70,44 @@ async function getOccurrenceById(req, res) {
         });
     }
 }
+
+async function updateOccurrence(req, res) {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      const user = req.user; // Retrieved from middleware
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized.' });
+      }
+      
+      const updatedOccurrence = await Occurrence.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
+      if (!updatedOccurrence) {
+        return res.status(404).json({ message: 'Occurrence not found' });
+      }
+      res.status(200).json(updatedOccurrence);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
   
-  module.exports = {saveOccurrence, getOccurrenceById,getOccurrence };
+  // Delete occurrence
+  async function deleteOccurrence(req, res) {
+    try {
+      const { id } = req.params;
+      const user = req.user; // Retrieved from middleware
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized.' });
+      }
+      const deletedOccurrence = await Occurrence.findByIdAndDelete(id);
+      if (!deletedOccurrence) {
+        return res.status(404).json({ message: 'Occurrence not found' });
+      }
+      res.status(200).json({ message: 'Occurrence deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+  
+  
+  module.exports = { getOccurrenceById,getOccurrence, updateOccurrence, deleteOccurrence };
   

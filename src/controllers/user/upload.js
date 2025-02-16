@@ -123,6 +123,47 @@ async function uploadImage(req, res) {
 //   }
 // }
 
+async function updateUpload(req, res) {
+  try {
+    const { id } = req.params;
+    const { title, description } = req.body;
+    const user = req.user; // Retrieved from middleware
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
+    
+    const updatedUpload = await Upload.findByIdAndUpdate(
+      id,
+      { title, description },
+      { new: true, runValidators: true }
+    );
+    
+    if (!updatedUpload) {
+      return res.status(404).json({ message: 'Upload not found' });
+    }
+    res.status(200).json(updatedUpload);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+// Delete upload
+async function deleteUpload(req, res) {
+  try {
+    const { id } = req.params;
+    const user = req.user; // Retrieved from middleware
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
+    const deletedUpload = await Upload.findByIdAndDelete(id);
+    if (!deletedUpload) {
+      return res.status(404).json({ message: 'Upload not found' });
+    }
+    res.status(200).json({ message: 'Upload deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
 
 async function getUserUploads(req, res) {
     const user = req.user; // Retrieved from middleware
@@ -143,6 +184,10 @@ async function getUserUploads(req, res) {
     try {
         const userId = req.user.id;
         const uploads = await Upload.find({ user: userId, status: { $in: ['approved', 'declined'] } });
+        const user = req.user; // Retrieved from middleware
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
         
         const formattedUploads = uploads.map(upload => ({
             uploadID: upload._id,
@@ -162,6 +207,10 @@ async function getPendingList(req, res) {
     try {
         const userId = req.user.id;
         const uploads = await Upload.find({ user: userId, status: 'waiting' });
+        const user = req.user; // Retrieved from middleware
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
         
         const pendingUploads = uploads.map(upload => ({
             uploadID: upload._id,
@@ -179,6 +228,10 @@ async function getPendingList(req, res) {
 async function getPendingData(req, res) {
     try {
         const { uploadID } = req.body;
+        const user = req.user; // Retrieved from middleware
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
         const upload = await Upload.findById(uploadID);
 
         if (!upload) {
@@ -197,7 +250,7 @@ async function getPendingData(req, res) {
 }
 
 
-module.exports = { uploadImage,getUserUploads,getUploadHistory,getPendingList,getPendingData };
+module.exports = { uploadImage,updateUpload,deleteUpload,getUserUploads,getUploadHistory,getPendingList,getPendingData };
 
 
 

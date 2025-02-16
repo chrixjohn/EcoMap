@@ -10,7 +10,10 @@ async function expertauth(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // Use the secret from .env
-    const expert = await Expert.findOne({ _id: decoded.id });
+    const expert = await Expert.findById(decoded.id);
+    if (decoded.role != "expert") {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     if (!expert) {
       return res.status(401).json({ message: "Expert not found please register" });
     }

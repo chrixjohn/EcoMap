@@ -79,7 +79,7 @@ async function loginuser(req, res) {
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
     
     
-    const token = jwt.sign({ id: user._id, name: user.name, email: user.email}, process.env.JWT_SECRET, { expiresIn: '365d' });
+    const token = jwt.sign({ id: user._id, name: user.name, email: user.email, role:"user"}, process.env.JWT_SECRET, { expiresIn: '365d' });
     res.json({ message: 'Login successful', token });
   } catch (error) {
     res.status(500).json({ message: 'Error logging in', error });
@@ -98,6 +98,76 @@ async function getUserDetails(req, res) {
   }
 }
 
+async function updateUser(req, res) {
+  try {
+    
+    const { name, email, password } = req.body;
+    const user = req.user; // Retrieved from middleware
+
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
+
+    const updates = {};
+
+    // Validate and add name if provided
+    if (name) {
+      updates.name = name;
+    }
+
+    // Validate email format if provided
+    if (email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: 'Invalid email format.' });
+      }
+      updates.email = email;
+    }
+
+    // Validate and hash password if provided
+    if (password) {
+      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+      if (!passwordRegex.test(password)) {
+        return res.status(400).json({
+          message: 'Password must be at least 8 characters long and include at least one letter and one number.',
+        });
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updates.password = hashedPassword;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(user.id, updates, { new: true, runValidators: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating user', error });
+  }
+}
+
+// Delete user
+async function deleteUser(req, res) {
+  try {
+    
+    const user = req.user; // Retrieved from middleware
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
+    
+    const deletedUser = await User.findByIdAndDelete(user.id);
+    
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting user', error });
+  }
+}
 
 async function forgotPassword(req, res) {
   try {
@@ -219,5 +289,5 @@ async function forgotPassword(req, res) {
 
 
 
-module.exports = {addNewUser,loginuser,getUserDetails,forgotPassword,verifyOtp,resetPassword};
+module.exports = {addNewUser,loginuser,getUserDetails,updateUser,deleteUser,forgotPassword,verifyOtp,resetPassword};
 

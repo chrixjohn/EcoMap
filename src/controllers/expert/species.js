@@ -54,8 +54,12 @@ async function getSpecies(req, res) {
   
   async function addSpecies(req, res) {
     const { common_name, scientific_name, taxonomy_class, conservation_status } = req.body;
+    const user = req.user;
     if (!req.file) {
       return res.status(401).json({ error: 'File is required' });
+    }
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
     }
     try {
 
@@ -88,8 +92,12 @@ async function getSpecies(req, res) {
   async function updateSpecies(req, res) {
     const { id } = req.params;
     const { common_name, scientific_name, taxonomy_class, conservation_status } = req.body;
+    const user = req.user;
   
     try {
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized.' });
+      }
       const species = await Species.findById(id);
       if (!species) return res.status(404).json({ message: 'Species not found' });
   
@@ -107,6 +115,11 @@ async function getSpecies(req, res) {
   
   async function deleteSpecies(req, res) {
     const { id } = req.params;
+    const user = req.user;
+  
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
   
     try {
       const species = await Species.findById(id);

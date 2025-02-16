@@ -65,7 +65,7 @@ async function loginAdmin(req, res) {
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
     
     
-    const token = jwt.sign({ id: user._id , name: user.name, email: user.email }, process.env.JWT_SECRET, { expiresIn: '365d' });
+    const token = jwt.sign({ id: user._id , name: user.name, email: user.email, role:"admin" }, process.env.JWT_SECRET, { expiresIn: '365d' });
     res.json({ message: 'Login successful', token });
   } catch (error) {
     res.status(500).json({ message: 'Error logging in', error });
@@ -78,9 +78,72 @@ async function getAdminDetails(req, res) {
     .catch(err => res.status(500).json({ message: 'Error fetching user details', error: err }));
 };
 
+async function updateAdmin(req, res) {
+  try {
+    const { name, email, password } = req.body;
+    const user = req.user; // Retrieved from middleware
+
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
+
+    const updates = {};
+
+    // Validate and add name if provided
+    if (name) {
+      updates.name = name;
+    }
+
+    // Validate email format if provided
+    if (email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: 'Invalid email format.' });
+      }
+      updates.email = email;
+    }
+
+    // Validate and hash password if provided
+    if (password) {
+      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+      if (!passwordRegex.test(password)) {
+        return res.status(400).json({
+          message: 'Password must be at least 8 characters long and include at least one letter and one number.',
+        });
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updates.password = hashedPassword;
+    }
+
+    const updatedAdmin = await Admin.findByIdAndUpdate(user.id, updates, { new: true, runValidators: true });
+
+    if (!updatedAdmin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+
+    res.status(200).json(updatedAdmin);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating admin', error });
+  }
+}
 
 
-
+// Delete admin
+async function deleteAdmin(req, res) {
+  try {
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
+    const deletedAdmin = await Admin.findByIdAndDelete(user.id);
+    if (!deletedAdmin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+    res.status(200).json({ message: 'Admin deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
 
 async function forgotPassword(req, res) {
   try {
@@ -198,5 +261,5 @@ async function forgotPassword(req, res) {
 
 
 
-module.exports = {addNewAdmin,loginAdmin,getAdminDetails,forgotPassword,verifyOtp,resetPassword};
+module.exports = {addNewAdmin,loginAdmin,getAdminDetails,updateAdmin,deleteAdmin,forgotPassword,verifyOtp,resetPassword};
 
