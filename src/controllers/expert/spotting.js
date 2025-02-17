@@ -1,4 +1,5 @@
 const Upload=require("../../models/uploadModel")
+const Occurrence=require("../../models/occurenceModel")
  async function getUpload (req, res) {
     try {
       const data = await Upload.find(); // Query all data
@@ -61,9 +62,9 @@ const Upload=require("../../models/uploadModel")
   
       await newOccurrence.save();
       await Upload.findByIdAndUpdate(spotId, { status: 'approved' });
-      res.status(201).json({ message: 'Occurrence saved successfully', occurrence: newOccurrence });
+      res.status(201).json({ message: 'Spotting saved successfully to Occurrence ', occurrence: newOccurrence });
     } catch (error) {
-      res.status(500).json({ message: 'Error saving occurrence', error });
+      res.status(500).json({ message: 'Error saving Spotting to Occurrence', error });
     }
   }
   
