@@ -122,10 +122,8 @@ async function getSpecies(req, res) {
     }
   
     try {
-      const species = await Species.findById(id);
+      const species = await Species.findByIdAndDelete(id);
       if (!species) return res.status(404).json({ message: 'Species not found' });
-  
-      await species.remove();
       res.json({ message: 'Species deleted' });
     } catch (error) {
       res.status(500).json({ message: 'Error deleting species', error });

@@ -1,4 +1,5 @@
 const Species = require("../../models/speciesModel");
+const cloudinary = require("../../config/cloudinary");
 
 async function species(req, res) {
     try {
@@ -13,6 +14,42 @@ async function species(req, res) {
     }
 }
 
+async function addSpecies(req, res) {
+  const { common_name, scientific_name, taxonomy_class, conservation_status } = req.body;
+  const user = req.user;
+  if (!req.file) {
+    return res.status(401).json({ error: 'File is required' });
+  }
+  if (!user) {
+    return res.status(401).json({ error: 'Unauthorized.' });
+  }
+  try {
+
+  const result = await new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'species' }, // Specify folder in Cloudinary
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    stream.end(req.file.buffer); // Pipe the buffer to Cloudinary
+  });
+  const newSpecies = new Species({
+    common_name,
+    scientific_name,
+    taxonomy_class,
+    conservation_status,
+    image:result.secure_url
+  });
+
+  
+    const savedSpecies = await newSpecies.save();
+    res.status(201).json(savedSpecies);
+  } catch (error) {
+    res.status(400).json({ message: 'Error saving species', error });
+  }
+}
 async function updateSpecies(req, res) {
     try {
       const { id } = req.params;
@@ -57,4 +94,4 @@ async function updateSpecies(req, res) {
   
   
 
-module.exports = { species, updateSpecies, deleteSpecies };
+module.exports = { species, addSpecies, updateSpecies, deleteSpecies };

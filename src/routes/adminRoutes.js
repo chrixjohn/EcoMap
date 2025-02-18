@@ -4,7 +4,7 @@ const app = express.Router();
 const {addNewAdmin, loginAdmin, getAdminDetails, updateAdmin, deleteAdmin, forgotPassword, verifyOtp, resetPassword, 
     getExperts, updateExpert, deleteExpert, 
     getUsers, updateUser, deleteUser, 
-    species, updateSpecies, deleteSpecies} = require("../controllers/admin");
+    species, addSpecies, updateSpecies, deleteSpecies} = require("../controllers/admin");
 
 app.post("/register", addNewAdmin)
 app.post("/login", loginAdmin)
@@ -24,6 +24,7 @@ app.put('/user/:id', adminauth, updateUser);
 app.delete('/user/:id', adminauth, deleteUser);
 
 app.get("/species", adminauth, species)
+app.post("/add-species", adminauth, addSpecies);
 app.put('/species/:id', adminauth, updateSpecies);
 app.delete('/species/:id', adminauth, deleteSpecies);
 
