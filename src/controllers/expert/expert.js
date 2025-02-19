@@ -74,7 +74,13 @@ async function loginexpert(req, res) {
 
 async function getExpertDetails(req, res) {
   User.findById(req.user.id)
-    .then(user => res.json(user))
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      const { _id, name, email, profilepic } = user;
+      res.json({ id: _id, name, email, profilepic });
+    })
     .catch(err => res.status(500).json({ message: 'Error fetching user details', error: err }));
 };
 

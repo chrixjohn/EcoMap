@@ -13,8 +13,8 @@ const {addNewExpert, loginexpert, getExpertDetails, updateExpert, deleteExpert, 
 app.post("/register", addNewExpert)
 app.post("/login", loginexpert)
 app.get("/get-expert", expertauth, getExpertDetails)
-app.put('/update-expert/:id', expertauth, updateExpert);
-app.delete('/delete-expert/:id', expertauth, deleteExpert);
+app.put('/update-expert', expertauth, updateExpert);
+app.delete('/delete-expert', expertauth, deleteExpert);
 app.post('/forgot-password', forgotPassword)
 app.post('/verify-otp', verifyOtp)
 app.post('/reset-password',  resetPassword);
