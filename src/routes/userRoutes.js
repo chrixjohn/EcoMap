@@ -9,8 +9,8 @@ const {addNewUser, loginuser, getUserDetails, updateUser, deleteUser, forgotPass
 app.post("/register", addNewUser)
 app.post("/login", loginuser)
 app.get("/get-user", userauth, getUserDetails)
-app.put('/update-user/:id', userauth, updateUser);
-app.delete('/delete-user/:id', userauth, deleteUser);
+app.put('/update-user', userauth, updateUser);
+app.delete('/delete-user', userauth, deleteUser);
 app.post('/forgot-password', forgotPassword)
 app.post('/verify-otp', verifyOtp)
 app.post('/reset-password',  resetPassword);
@@ -23,7 +23,7 @@ app.post('/upload-history', userauth, getUploadHistory);
 app.post('/pending-list', userauth, getPendingList);
 app.post('/pending-data', userauth, getPendingData);
 
-app.get('/map',  getGeoJSONData);
+app.get('/map', getGeoJSONData);
 
 
 

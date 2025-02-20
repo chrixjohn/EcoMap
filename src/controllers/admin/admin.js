@@ -121,7 +121,7 @@ async function updateAdmin(req, res) {
       updates.password = hashedPassword;
     }
 
-    const updatedAdmin = await Admin.findByIdAndUpdate(user.id, updates, { new: true, runValidators: true });
+    const updatedAdmin = await User.findByIdAndUpdate(user.id, updates, { new: true, runValidators: true });
 
     if (!updatedAdmin) {
       return res.status(404).json({ message: 'Admin not found' });
@@ -136,12 +136,13 @@ async function updateAdmin(req, res) {
 
 // Delete admin
 async function deleteAdmin(req, res) {
+  const user = req.user;
   try {
     
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized.' });
     }
-    const deletedAdmin = await Admin.findByIdAndDelete(user.id);
+    const deletedAdmin = await User.findByIdAndDelete(user.id);
     if (!deletedAdmin) {
       return res.status(404).json({ message: 'Admin not found' });
     }

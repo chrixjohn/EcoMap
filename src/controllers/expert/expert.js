@@ -121,7 +121,7 @@ async function updateExpert(req, res) {
        updates.password = hashedPassword; // Use the hashed password;
     }
     
-    const updatedExpert = await Expert.findByIdAndUpdate(user.id, updates, { new: true });
+    const updatedExpert = await User.findByIdAndUpdate(user.id, updates, { new: true });
     
     if (!updatedExpert) {
       return res.status(404).json({ message: 'Expert not found' });
@@ -129,7 +129,7 @@ async function updateExpert(req, res) {
 
     res.status(200).json(updatedExpert);
   } catch (error) {
-    res.status(500).json({ message: 'Error updating user', error });
+    res.status(500).json({ message: 'Error updating user', error: error.message || error });
   }
 }
 
@@ -142,7 +142,7 @@ async function deleteExpert(req, res) {
       return res.status(401).json({ error: 'Unauthorized.' });
     }
     
-    const deletedExpert = await Expert.findByIdAndDelete(user.id);
+    const deletedExpert = await User.findByIdAndDelete(user.id);
     
     if (!deletedExpert) {
       return res.status(404).json({ message: 'Expert not found' });

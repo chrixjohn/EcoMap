@@ -5,7 +5,7 @@ const expertSchema = new Schema({
   name: { type: String, required: true,},
   email: { type: String, required: true ,unique: true},
   password: { type: String, required: true },
-  profilepic: { type: String, default: null },
+  profilepic: { type: String, default: 'https://www.iihm.ac.in/wp-content/uploads/2019/01/Mubeena-768x768.jpg' },
 });
 
 expertSchema.pre('findOneAndDelete', async function(next) {

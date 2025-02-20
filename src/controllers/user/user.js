@@ -88,7 +88,7 @@ async function loginuser(req, res) {
 
 async function getUserDetails(req, res) {
   try {
-    const user = await User.findById(req.user.id).select('name email');
+    const user = await User.findById(req.user.id).select('_id name email profilepic');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -144,7 +144,7 @@ async function updateUser(req, res) {
 
     res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).json({ message: 'Error updating user', error });
+    res.status(500).json({ message: 'Error updating user',  error: error.message || error  });
   }
 }
 

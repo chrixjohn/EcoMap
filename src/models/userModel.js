@@ -5,7 +5,7 @@ const userSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  profilepic: { type: String, default: null },
+  profilepic: { type: String, default: 'https://cdn.pixabay.com/photo/2021/07/02/04/48/user-6380868_1280.png' },
 });
 
 userSchema.pre('findOneAndDelete', async function(next) {

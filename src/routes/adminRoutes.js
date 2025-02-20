@@ -1,5 +1,6 @@
 const express = require("express");
 const adminauth = require("../middlewares/adminauth");
+const upload = require("../config/multer");
 const app = express.Router();
 const {addNewAdmin, loginAdmin, getAdminDetails, updateAdmin, deleteAdmin, forgotPassword, verifyOtp, resetPassword, 
     getExperts, updateExpert, deleteExpert, 
@@ -24,7 +25,7 @@ app.put('/user/:id', adminauth, updateUser);
 app.delete('/user/:id', adminauth, deleteUser);
 
 app.get("/species", adminauth, species)
-app.post("/add-species", adminauth, addSpecies);
+app.post("/add-species", adminauth, upload.single('image'), addSpecies);
 app.put('/species/:id', adminauth, updateSpecies);
 app.delete('/species/:id', adminauth, deleteSpecies);
 
