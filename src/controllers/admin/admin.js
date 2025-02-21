@@ -44,6 +44,71 @@ async function addNewAdmin(req, res) {
     // Create and save the new user
     const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
+    const transporter = nodemailer.createTransport({
+          service: "Gmail",
+          auth: {
+            user: process.env.EMAIL,
+            pass: process.env.EMAIL_PASSWORD,
+            
+          },
+          pool: true, // Use pooled connections
+      maxConnections: 1, // Limit concurrent connections
+      rateDelta: 15000, // Minimum time between messages
+      rateLimit: 5, // Maximum messages per rateDelta
+      secure: true // Use TLS
+        });
+    
+        // Email content
+        const mailOptions = {
+          from: `"Eco Map" <${process.env.EMAIL}>`,
+          to: email,
+          subject: 'EcoMap: User Login Credentials',
+          headers: {
+            'X-Priority': '1',
+            'X-MSMail-Priority': 'High',
+            'Importance': 'high',
+            'X-Mailer': 'EcoMap Application'
+          },
+          html: `
+              
+             <html>
+      <body style="font-family: Arial, sans-serif; background-color: #f4f7fc; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+          <h2 style="color: #333333; text-align: center;">Eco Map - Welcome Admin!</h2>
+          <p style="font-size: 16px; color: #333333;">Hello ${name},</p>
+          <p style="font-size: 16px; color: #333333;">We are excited to have you on board. Eco Map helps you explore and contribute to a greener planet.</p>
+          <p style="font-size: 16px; color: #333333;">Below are your login credentials:</p>
+          <div style="text-align: center; margin: 20px 0;">
+            <h3 style="font-size: 18px; margin-bottom: 3px; color: white; background-color: #4CAF50; font-weight: bold; padding: 10px 30px; border-radius: 5px; display: inline-block;">Email</h3>
+            <br>
+            <div style="font-size: 18px;margin-bottom: 0px; font-weight: bold; padding: 10px; border-radius: 5px; display: block; max-width: 600px; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; margin: 0 auto;">
+              ${email}
+            </div>
+            <br>
+            <h3 style="font-size: 18px; margin-bottom: 5px; margin-top: 0px; color: white; background-color: #4CAF50; font-weight: bold; padding: 10px 30px; border-radius: 5px; display: inline-block;">Password</h3>
+            <br>
+            <div style="font-size: 18px; font-weight: bold; padding: 10px; border-radius: 5px; display: block; max-width: 600px; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; margin: 0 auto;">
+              ${password}
+            </div>
+          </div>
+          <p style="font-size: 16px; color: #333333; font-weight: bold; text-align: center;">Please do not share your login credentials with anyone and keep this information safe.</p>
+          <p style="font-size: 16px; color: #333333;">Get started by logging in and exploring the features designed to make a positive impact.</p>
+          <p style="font-size: 16px; color: #333333;">If you have any questions or need assistance, our support team is here to help.</p>
+          <div style="text-align: center; margin-top: 30px;">
+            <p style="font-size: 14px; color: #888888;">&copy; 2025 Eco Map. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+    </html>
+    
+    
+          `,
+      };
+      
+      
+        // Send the email
+        const mail=await transporter.sendMail(mailOptions);
+        console.log(mail);
 
     res.status(201).json({ message: 'User registered successfully!' });
   } catch (error) {
