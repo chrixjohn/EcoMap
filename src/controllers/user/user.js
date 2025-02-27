@@ -139,6 +139,12 @@ async function loginuser(req, res) {
     const user = await User.findOne({ email });
     
     if (!user) return res.status(401).json({ message: 'User not found' });
+    if ( user.status == 'waiting') {
+      return res.status(403).json({ message: 'User account is not approved.' });
+    }
+    if (user.status == 'rejected') {
+      return res.status(403).json({ message: 'User account is rejected.' });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });

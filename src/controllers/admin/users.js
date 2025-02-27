@@ -6,12 +6,43 @@ async function getUsers (req, res)  {
       if (!user) {
         return res.status(401).json({ error: 'Unauthorized.' });
       }
-      const users = await User.find().select('name email'); // Only return name and email
+      const users = await User.find({ status: 'approved' }).select('name email'); // Only return name and email where status is approved
       res.status(200).json(users); // Send the experts as a JSON response
     } catch (error) {
       res.status(500).json({ message: 'Error fetching experts', error });
     }
   };
+
+// Function to approve a user
+async function approveUser(req, res) {
+  const {id} = req.params;
+
+  try {
+    const user = await User.findByIdAndUpdate(id, { status: 'approved' }, { new: true });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ message: 'User approved successfully', user });
+  } catch (error) {
+    res.status(500).json({ message: 'Error approving user', error });
+  }
+}
+
+// Function to reject a user
+async function rejectUser(req, res) {
+  const {id} = req.params;
+
+  try {
+    const user = await User.findByIdAndUpdate(id, { status: 'rejected' }, { new: true });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ message: 'User rejected successfully', user });
+  } catch (error) {
+    res.status(500).json({ message: 'Error rejecting user', error });
+  }
+}
+
 
   async function updateUser(req, res) {
     try {
@@ -87,4 +118,4 @@ async function getUsers (req, res)  {
   
 
 
-  module.exports = {getUsers,updateUser,deleteUser};
+  module.exports = {getUsers,approveUser, rejectUser ,updateUser,deleteUser};

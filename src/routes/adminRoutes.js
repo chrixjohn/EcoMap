@@ -4,7 +4,7 @@ const upload = require("../config/multer");
 const app = express.Router();
 const {addNewAdmin, loginAdmin, getAdminDetails, updateAdmin, deleteAdmin, forgotPassword, verifyOtp, resetPassword, 
     getExperts, updateExpert, deleteExpert, 
-    getUsers, updateUser, deleteUser, 
+    getUsers, approveUser, rejectUser, updateUser, deleteUser, 
     species, addSpecies, updateSpecies, deleteSpecies} = require("../controllers/admin");
 
 app.post("/register", addNewAdmin)
@@ -21,6 +21,8 @@ app.put('/expert/:id', adminauth, updateExpert);
 app.delete('/expert/:id', adminauth, deleteExpert);
 
 app.get("/users", adminauth , getUsers)
+app.put('/user/:id/approve', adminauth, approveUser);
+app.put('/user/:id/reject', adminauth, rejectUser);
 app.put('/user/:id', adminauth, updateUser);
 app.delete('/user/:id', adminauth, deleteUser);
 
