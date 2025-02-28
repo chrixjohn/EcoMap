@@ -185,6 +185,23 @@ async function updateExpert(req, res) {
        const hashedPassword = await bcrypt.hash(password, 10);
        updates.password = hashedPassword; // Use the hashed password;
     }
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'expertprofile' },
+          (error, result) => {
+            if (error) {
+              reject(new Error('Error uploading image'));
+            } else {
+              resolve(result);
+            }
+          }
+        );
+        stream.end(req.file.buffer); // Send file buffer to Cloudinary
+      });
+    
+      updates.profilepic = result.secure_url;
+    }
     
     const updatedExpert = await User.findByIdAndUpdate(user.id, updates, { new: true });
     

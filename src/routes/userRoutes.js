@@ -9,7 +9,7 @@ const {addNewUser, loginuser, getUserDetails, updateUser, deleteUser, forgotPass
 app.post("/register", addNewUser)
 app.post("/login", loginuser)
 app.get("/get-user", userauth, getUserDetails)
-app.put('/update-user', userauth, upload.single('image'), updateUser);
+app.put('/update-user', userauth, upload.single('profilepic'), updateUser);
 app.delete('/delete-user', userauth, deleteUser);
 app.post('/forgot-password', forgotPassword)
 app.post('/verify-otp', verifyOtp)

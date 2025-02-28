@@ -6,6 +6,7 @@ const Otp = require('../../models/otpModel');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const cloudinary = require('../../config/cloudinary');
+const { log } = require('console');
 
 async function addNewUser(req, res) {
   const { name, email, password } = req.body;
@@ -144,7 +145,19 @@ async function updateUser(req, res) {
 
     // Update profile picture using Cloudinary if provided
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, { folder: 'userprofile' });
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'userprofile' },
+          (error, result) => {
+            if (error) {
+              reject(new Error('Error uploading image'));
+            } else {
+              resolve(result);
+            }
+          }
+        );
+        stream.end(req.file.buffer); // Send file buffer to Cloudinary
+      });
       updates.profilepic = result.secure_url;
     }
 

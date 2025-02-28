@@ -10,7 +10,7 @@ const {addNewAdmin, loginAdmin, getAdminDetails, updateAdmin, deleteAdmin, forgo
 app.post("/register", addNewAdmin)
 app.post("/login", loginAdmin)
 app.get("/get-admin", adminauth, getAdminDetails)
-app.put('/update-admin', adminauth, updateAdmin);
+app.put('/update-admin', adminauth, upload.single('profilepic'),updateAdmin);
 app.delete('/delete-admin', adminauth, deleteAdmin);
 app.post('/forgot-password', forgotPassword)
 app.post('/verify-otp', verifyOtp)

@@ -1,6 +1,25 @@
 const Occurrence = require("../../models/occurenceModel")
 const Upload = require("../../models/uploadModel")
 
+async function getOccurrencesOfExpert(req, res) {
+  const user = req.user; // Retrieved from middleware
+      if (!user) {
+        return res.status(401).json({ error: 'Unauthorized.' });
+      }
+
+  try {
+    const occurrences = await Occurrence.find({ expertId: user.id }).populate('spotId speciesId expertId userId');
+    
+    if (occurrences.length === 0) {
+      return res.status(404).json({ message: 'No occurrences found for this user' });
+    }
+
+    res.status(200).json(occurrences);
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving occurrences', error });
+  }
+}
+
 async function getOccurrenceById(req, res) {
     const { id } = req.params;
   
@@ -109,5 +128,5 @@ async function updateOccurrence(req, res) {
   }
   
   
-  module.exports = { getOccurrenceById,getOccurrence, updateOccurrence, deleteOccurrence };
+  module.exports = { getOccurrencesOfExpert,getOccurrenceById,getOccurrence, updateOccurrence, deleteOccurrence };
   

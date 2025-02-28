@@ -5,7 +5,7 @@ const app = express.Router();
 const {addNewExpert, loginexpert, getExpertDetails, updateExpert, deleteExpert, forgotPassword, verifyOtp, resetPassword, 
     getUpload, getlistUpload, getUploadById, saveUpload, rejectUpload, 
     addSpecies,  getSpecies, getSpeciesById,  updateSpecies,  deleteSpecies, 
-    getOccurrence, getOccurrenceById, updateOccurrence, deleteOccurrence,
+    getOccurrencesOfExpert,getOccurrence, getOccurrenceById, updateOccurrence, deleteOccurrence,
     countAllDocuments, 
     getGeoJSONData, speciesMap} = require("../controllers/expert");
 
@@ -13,7 +13,7 @@ const {addNewExpert, loginexpert, getExpertDetails, updateExpert, deleteExpert, 
 app.post("/register", addNewExpert)
 app.post("/login", loginexpert)
 app.get("/get-expert", expertauth, getExpertDetails)
-app.put('/update-expert', expertauth, updateExpert);
+app.put('/update-expert', expertauth, upload.single('profilepic'),updateExpert);
 app.delete('/delete-expert', expertauth, deleteExpert);
 app.post('/forgot-password', forgotPassword)
 app.post('/verify-otp', verifyOtp)
@@ -31,6 +31,7 @@ app.get("/get-species/:id", getSpeciesById)
 app.post("/update-species/:id", expertauth, updateSpecies)
 app.post("/delete-species/:id", expertauth, deleteSpecies)
 
+app.get("/get-expert-occurrences", expertauth, getOccurrencesOfExpert)
 app.get("/get-occurance", getOccurrence)
 app.get("/get-occurance/:id", getOccurrenceById)
 app.put('/occurrence/:id', expertauth, updateOccurrence);
