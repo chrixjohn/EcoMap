@@ -9,9 +9,23 @@ async function getUsers (req, res)  {
       const users = await User.find({ status: 'approved' }).select('name email'); // Only return name and email where status is approved
       res.status(200).json(users); // Send the experts as a JSON response
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching experts', error });
+      res.status(500).json({ message: 'Error fetching users', error });
     }
   };
+
+async function pendingUsers(req, res) {
+  try {
+    const user = req.user; // Retrieved from middleware
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized.' });
+    }
+    const users = await User.find({ status: 'pending' }).select('name email'); // Only return name and email where status is pending
+    res.status(200).json(users); // Send the experts as a JSON response
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching users', error });
+  }
+    }
+  
 
 // Function to approve a user
 async function approveUser(req, res) {
@@ -118,4 +132,4 @@ async function rejectUser(req, res) {
   
 
 
-  module.exports = {getUsers,approveUser, rejectUser ,updateUser,deleteUser};
+  module.exports = {getUsers,pendingUsers,approveUser, rejectUser ,updateUser,deleteUser};
