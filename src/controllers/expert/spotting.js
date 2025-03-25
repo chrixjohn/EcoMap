@@ -1,91 +1,133 @@
-const Upload=require("../../models/uploadModel")
-const Occurrence=require("../../models/occurenceModel")
- async function getUpload (req, res) {
+const Upload = require("../../models/uploadModel");
+const Occurrence = require("../../models/occurenceModel");
+async function getUpload(req, res) {
     try {
-      const data = await Upload.find(); // Query all data
-      res.json(data);  // Send data as JSON response
+        const data = await Upload.find(); // Query all data
+        res.json(data); // Send data as JSON response
     } catch (err) {
-    
-      res.status(500).json({ error: 'Failed to retrieve data',err });
+        res.status(500).json({ error: "Failed to retrieve data", err });
     }
-  };
+}
 
-
-  async function getlistUpload(req, res) {
+async function getlistUpload(req, res) {
     try {
-      // Query where status is 'waiting' and select specific fields
-      const data = await Upload.find({ status: 'waiting' }, 'image _id title');
-  
-      // Send the filtered data as JSON response
-      res.json(data);
-    } catch (err) {
-      // Handle errors and send error response
-      res.status(500).json({ error: 'Failed to retrieve data' });
+        const { page = 1, limit = 25 } = req.query;
+
+        // Convert page & limit to integers and enforce a max limit
+        const parsedPage = parseInt(page) || 1;
+        const parsedLimit = parseInt(limit) || 25;
+        const maxLimit = 25;
+        const finalLimit = parsedLimit > maxLimit ? maxLimit : parsedLimit;
+
+        // Fetch total count for waiting uploads before applying pagination
+        const totalItems = await Upload.countDocuments({ status: "waiting" });
+        const totalPages = Math.ceil(totalItems / finalLimit);
+
+        if (parsedPage > totalPages && totalPages !== 0) {
+            return res.status(500).json({
+                page: parsedPage,
+                limit: finalLimit,
+                totalItems,
+                totalPages,
+                message: "Page number exceeds total pages available.",
+            });
+        }
+
+        // Fetch paginated uploads where status is "waiting", sorted by latest first
+        const uploads = await Upload.find({ status: "waiting" })
+            .sort({ date: -1 }) // Sort by latest first
+            .skip((parsedPage - 1) * finalLimit)
+            .limit(finalLimit)
+            .exec();
+
+        // Return response with pagination info
+        res.status(200).json({
+            page: parsedPage,
+            limit: finalLimit,
+            totalItems,
+            totalPages,
+            data: uploads,
+        });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({
+            message: "Error retrieving upload details",
+            error,
+        });
     }
-  }
+}
 
-
-  async function getUploadById(req, res) {
+async function getUploadById(req, res) {
     const { id } = req.params;
-  
-    try {
-      const upload = await Upload.findById(id).populate('user', 'name email');
-      
-      if (!upload) {
-        return res.status(404).json({ message: 'Upload not found' });
-      }
-      res.json(upload);
-    } catch (error) {
-      res.status(500).json({ message: 'Error retrieving upload details', error });
-    }
-  }
 
-  async function saveUpload(req, res) {
-    const { spotId,  speciesId, userId } = req.body;
-  
+    try {
+        const upload = await Upload.findById(id).populate("user", "name email");
+
+        if (!upload) {
+            return res.status(404).json({ message: "Upload not found" });
+        }
+        res.json(upload);
+    } catch (error) {
+        res.status(500).json({
+            message: "Error retrieving upload details",
+            error,
+        });
+    }
+}
+
+async function saveUpload(req, res) {
+    const { spotId, speciesId, userId } = req.body;
+
     try {
         const user = req.user;
-        
+
         if (!user) {
-            return res.status(401).json({ error: 'Unauthorized.' });
+            return res.status(401).json({ error: "Unauthorized." });
         }
-      const newOccurrence = new Occurrence({
-        spotId,
-        
-        speciesId,
-        
-        userId,
-        
-        expertId:user.id,
-        
-      });
-  
-      await newOccurrence.save();
-      await Upload.findByIdAndUpdate(spotId, { status: 'approved' });
-      res.status(201).json({ message: 'Spotting saved successfully to Occurrence ', occurrence: newOccurrence });
+        const newOccurrence = new Occurrence({
+            spotId,
+
+            speciesId,
+
+            userId,
+
+            expertId: user.id,
+        });
+
+        await newOccurrence.save();
+        await Upload.findByIdAndUpdate(spotId, { status: "approved" });
+        res.status(201).json({
+            message: "Spotting saved successfully to Occurrence ",
+            occurrence: newOccurrence,
+        });
     } catch (error) {
-      res.status(500).json({ message: 'Error saving Spotting to Occurrence', error });
+        res.status(500).json({
+            message: "Error saving Spotting to Occurrence",
+            error,
+        });
     }
-  }
-  
-  async function rejectUpload(req, res) {
+}
+
+async function rejectUpload(req, res) {
     const { spotId } = req.body;
-  
+
     try {
         const user = req.user;
-       
-        if (!user) {
-            return res.status(401).json({ error: 'Unauthorized.' });
-        }
-      await Upload.findByIdAndUpdate(spotId, { status: 'declined' });
-      res.status(201).json({ message: 'Upload rejected successfully' });
-      
-    } catch (error) {
-      res.status(500).json({ message: 'Error saving occurrence', error });
-    }
-  }
-  
-  
-  
 
-  module.exports={getUpload,getlistUpload,getUploadById,saveUpload,rejectUpload}
+        if (!user) {
+            return res.status(401).json({ error: "Unauthorized." });
+        }
+        await Upload.findByIdAndUpdate(spotId, { status: "declined" });
+        res.status(201).json({ message: "Upload rejected successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error saving occurrence", error });
+    }
+}
+
+module.exports = {
+    getUpload,
+    getlistUpload,
+    getUploadById,
+    saveUpload,
+    rejectUpload,
+};
