@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const cloudinary = require('cloudinary').v2;
+const mongoose = require("mongoose");
+const cloudinary = require("cloudinary").v2;
 
 const speciesSchema = new mongoose.Schema({
   common_name: { type: String, required: true },
@@ -9,24 +9,28 @@ const speciesSchema = new mongoose.Schema({
   image: { type: String, required: true },
 });
 
-speciesSchema.pre('findOneAndDelete', async function(next) {
+speciesSchema.pre("findOneAndDelete", async function (next) {
   try {
     const species = await this.model.findOne(this.getQuery());
     if (species) {
       // Find related occurrences
-      const occurrences = await mongoose.model('Occurrence').find({ speciesId: species._id });
+      const occurrences = await mongoose
+        .model("Occurrence")
+        .find({ speciesId: species._id });
 
       // Extract spotIds from occurrences
-      const spotIds = occurrences.map(occurrence => occurrence.spotId);
+      const spotIds = occurrences.map((occurrence) => occurrence.spotId);
 
       // Update status of related uploads using spotIds
-      await mongoose.model('Upload').updateMany(
-        { _id: { $in: spotIds } },
-        { $set: { status: 'archived' } }
-      );
+      await mongoose
+        .model("Upload")
+        .updateMany(
+          { _id: { $in: spotIds } },
+          { $set: { status: "archived" } }
+        );
 
       // Delete related occurrences
-      await mongoose.model('Occurrence').deleteMany({ speciesId: species._id });
+      await mongoose.model("Occurrence").deleteMany({ speciesId: species._id });
 
       // Delete the image from Cloudinary
       // if (species.image) {
@@ -46,5 +50,5 @@ speciesSchema.pre('findOneAndDelete', async function(next) {
   }
 });
 
-const Species = mongoose.model('Species', speciesSchema);
+const Species = mongoose.model("Species", speciesSchema);
 module.exports = Species;

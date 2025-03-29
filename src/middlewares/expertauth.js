@@ -15,7 +15,9 @@ async function expertauth(req, res, next) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     if (!expert) {
-      return res.status(401).json({ message: "Expert not found please register" });
+      return res
+        .status(401)
+        .json({ message: "Expert not found please register" });
     }
     req.user = decoded; // Attach decoded user data to the request object
     next(); // Proceed to the next middleware or route handler

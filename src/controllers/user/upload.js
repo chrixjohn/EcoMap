@@ -1,43 +1,38 @@
-const cloudinary = require('../../config/cloudinary');
-const Upload = require('../../models/uploadModel');
+const cloudinary = require("../../config/cloudinary");
+const Upload = require("../../models/uploadModel");
 
-const fs = require('fs'); // To remove files after upload
-
-
-
+const fs = require("fs"); // To remove files after upload
 
 async function uploadImage(req, res) {
   const { title, description } = req.body;
   const location = {
-  type: req.body['location.type'],
-  coordinates: req.body['location.coordinates'].map(Number), // Convert to numbers
-};
+    type: req.body["location.type"],
+    coordinates: req.body["location.coordinates"].map(Number), // Convert to numbers
+  };
 
   // Validate input
   if (!req.file) {
-    return res.status(401).json({ error: 'File is required' });
+    return res.status(401).json({ error: "File is required" });
   }
-  
+
   if (!title) {
-    return res.status(401).json({ error: 'Title is required' });
+    return res.status(401).json({ error: "Title is required" });
   }
-  
+
   if (!description) {
-    return res.status(401).json({ error: 'Description is required' });
+    return res.status(401).json({ error: "Description is required" });
   }
-  
-  
 
   try {
     const user = req.user; // Retrieved from middleware
     if (!user) {
-      return res.status(401).json({ error: 'Unauthorized.' });
+      return res.status(401).json({ error: "Unauthorized." });
     }
 
     // Upload file to Cloudinary directly from memory
     const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
-        { folder: 'uploads' }, // Specify folder in Cloudinary
+        { folder: "uploads" }, // Specify folder in Cloudinary
         (error, result) => {
           if (error) reject(error);
           else resolve(result);
@@ -60,16 +55,16 @@ async function uploadImage(req, res) {
     // const uploads = await Upload.find({ user: user.id }).populate('user', 'name email');
 
     res.status(201).json({
-      message: 'Image uploaded successfully!',
+      message: "Image uploaded successfully!",
       upload: newUpload,
-      
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", details: error.message });
   }
 }
-
 
 // async function uploadImage(req, res) {
 //   const { title, description, location } = req.body;
@@ -115,7 +110,7 @@ async function uploadImage(req, res) {
 //       message: 'Image uploaded successfully!',
 //       upload: newUpload,
 //       total:uploads
-      
+
 //     });
 //   } catch (error) {
 //     console.error(error);
@@ -129,17 +124,17 @@ async function updateUpload(req, res) {
     const { title, description } = req.body;
     const user = req.user; // Retrieved from middleware
     if (!user) {
-      return res.status(401).json({ error: 'Unauthorized.' });
+      return res.status(401).json({ error: "Unauthorized." });
     }
-    
+
     const updatedUpload = await Upload.findByIdAndUpdate(
       id,
       { title, description },
       { new: true, runValidators: true }
     );
-    
+
     if (!updatedUpload) {
-      return res.status(404).json({ message: 'Upload not found' });
+      return res.status(404).json({ message: "Upload not found" });
     }
     res.status(200).json(updatedUpload);
   } catch (error) {
@@ -153,104 +148,110 @@ async function deleteUpload(req, res) {
     const { id } = req.params;
     const user = req.user; // Retrieved from middleware
     if (!user) {
-      return res.status(401).json({ error: 'Unauthorized.' });
+      return res.status(401).json({ error: "Unauthorized." });
     }
     const deletedUpload = await Upload.findByIdAndDelete(id);
     if (!deletedUpload) {
-      return res.status(404).json({ message: 'Upload not found' });
+      return res.status(404).json({ message: "Upload not found" });
     }
-    res.status(200).json({ message: 'Upload deleted successfully' });
+    res.status(200).json({ message: "Upload deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 }
 
 async function getUserUploads(req, res) {
-    const user = req.user; // Retrieved from middleware
-    if (!user) {
-      return res.status(401).json({ error: 'Unauthorized.' });
-    }
-  
-    try {
-      const uploads = await Upload.find({ user: user.id });
-      res.status(200).json(uploads);
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch uploads.' });
-    }
+  const user = req.user; // Retrieved from middleware
+  if (!user) {
+    return res.status(401).json({ error: "Unauthorized." });
   }
 
+  try {
+    const uploads = await Upload.find({ user: user.id });
+    res.status(200).json(uploads);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch uploads." });
+  }
+}
 
-  async function getUploadHistory(req, res) {
-    try {
-        const userId = req.user.id;
-        const uploads = await Upload.find({ user: userId, status: { $in: ['approved', 'declined'] } });
-        const user = req.user; // Retrieved from middleware
+async function getUploadHistory(req, res) {
+  try {
+    const userId = req.user.id;
+    const uploads = await Upload.find({
+      user: userId,
+      status: { $in: ["approved", "declined"] },
+    });
+    const user = req.user; // Retrieved from middleware
     if (!user) {
-      return res.status(401).json({ error: 'Unauthorized.' });
+      return res.status(401).json({ error: "Unauthorized." });
     }
-        
-        const formattedUploads = uploads.map(upload => ({
-            uploadID: upload._id,
-            status: upload.status,
-            name: upload.title,
-            date: upload.date
-        }));
 
-        res.json(formattedUploads);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
+    const formattedUploads = uploads.map((upload) => ({
+      uploadID: upload._id,
+      status: upload.status,
+      name: upload.title,
+      date: upload.date,
+    }));
+
+    res.json(formattedUploads);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
 }
 
 // Get pending uploads
 async function getPendingList(req, res) {
-    try {
-        const userId = req.user.id;
-        const uploads = await Upload.find({ user: userId, status: 'waiting' });
-        const user = req.user; // Retrieved from middleware
+  try {
+    const userId = req.user.id;
+    const uploads = await Upload.find({ user: userId, status: "waiting" });
+    const user = req.user; // Retrieved from middleware
     if (!user) {
-      return res.status(401).json({ error: 'Unauthorized.' });
+      return res.status(401).json({ error: "Unauthorized." });
     }
-        
-        const pendingUploads = uploads.map(upload => ({
-            uploadID: upload._id,
-            name: upload.title,
-            date: upload.date
-        }));
 
-        res.json(pendingUploads);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
+    const pendingUploads = uploads.map((upload) => ({
+      uploadID: upload._id,
+      name: upload.title,
+      date: upload.date,
+    }));
+
+    res.json(pendingUploads);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
 }
 
 // Get full data of a pending upload
 async function getPendingData(req, res) {
-    try {
-        const { uploadID } = req.body;
-        const user = req.user; // Retrieved from middleware
+  try {
+    const { uploadID } = req.body;
+    const user = req.user; // Retrieved from middleware
     if (!user) {
-      return res.status(401).json({ error: 'Unauthorized.' });
+      return res.status(401).json({ error: "Unauthorized." });
     }
-        const upload = await Upload.findById(uploadID);
+    const upload = await Upload.findById(uploadID);
 
-        if (!upload) {
-            return res.status(404).json({ error: 'Upload not found' });
-        }
-
-        res.json({
-            uploadID: upload._id,
-            image: upload.image,
-            date: upload.date,
-            location: upload.location
-        });
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
+    if (!upload) {
+      return res.status(404).json({ error: "Upload not found" });
     }
+
+    res.json({
+      uploadID: upload._id,
+      image: upload.image,
+      date: upload.date,
+      location: upload.location,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
 }
 
-
-module.exports = { uploadImage,updateUpload,deleteUpload,getUserUploads,getUploadHistory,getPendingList,getPendingData };
-
-
-
+module.exports = {
+  uploadImage,
+  updateUpload,
+  deleteUpload,
+  getUserUploads,
+  getUploadHistory,
+  getPendingList,
+  getPendingData,
+};

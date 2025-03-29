@@ -13,7 +13,7 @@ const uploadSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ["approved", "waiting", "declined","archived"],
+    enum: ["approved", "waiting", "declined", "archived"],
     default: "waiting",
   },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },

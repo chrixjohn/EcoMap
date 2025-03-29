@@ -15,7 +15,9 @@ async function adminauth(req, res, next) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     if (!admin) {
-      return res.status(401).json({ message: "Admin not found please register" });
+      return res
+        .status(401)
+        .json({ message: "Admin not found please register" });
     }
     req.user = decoded; // Attach decoded user data to the request object
     next(); // Proceed to the next middleware or route handler
