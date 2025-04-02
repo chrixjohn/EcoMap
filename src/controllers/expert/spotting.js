@@ -2,8 +2,8 @@ const Upload = require("../../models/uploadModel");
 const Occurrence = require("../../models/occurenceModel");
 async function getUpload(req, res) {
   try {
-    const data = await Upload.find(); // Query all data
-    res.json(data); // Send data as JSON response
+    const data = await Upload.find();
+    res.json(data);
   } catch (err) {
     res.status(500).json({ error: "Failed to retrieve data", err });
   }
@@ -13,13 +13,11 @@ async function getlistUpload(req, res) {
   try {
     const { page = 1, limit = 25 } = req.query;
 
-    // Convert page & limit to integers and enforce a max limit
     const parsedPage = parseInt(page) || 1;
     const parsedLimit = parseInt(limit) || 25;
     const maxLimit = 25;
     const finalLimit = parsedLimit > maxLimit ? maxLimit : parsedLimit;
 
-    // Fetch total count for waiting uploads before applying pagination
     const totalItems = await Upload.countDocuments({ status: "waiting" });
     const totalPages = Math.ceil(totalItems / finalLimit);
 
@@ -33,14 +31,12 @@ async function getlistUpload(req, res) {
       });
     }
 
-    // Fetch paginated uploads where status is "waiting", sorted by latest first
     const uploads = await Upload.find({ status: "waiting" })
-      .sort({ date: -1 }) // Sort by latest first
+      .sort({ date: -1 })
       .skip((parsedPage - 1) * finalLimit)
       .limit(finalLimit)
       .exec();
 
-    // Return response with pagination info
     res.status(200).json({
       page: parsedPage,
       limit: finalLimit,

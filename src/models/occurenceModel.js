@@ -32,11 +32,12 @@ occurrenceSchema.pre("findOneAndDelete", async function (next) {
   try {
     const occurrence = await this.model.findOne(this.getQuery());
     if (occurrence) {
-      // Update status of related upload
-      await mongoose.model("Upload").updateOne(
-        { _id: occurrence.spotId },
-        { $set: { status: "archived" } } // Change 'archived' to your desired status
-      );
+      await mongoose
+        .model("Upload")
+        .updateOne(
+          { _id: occurrence.spotId },
+          { $set: { status: "archived" } }
+        );
     }
     next();
   } catch (error) {

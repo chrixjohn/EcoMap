@@ -8,20 +8,17 @@ const crypto = require("crypto");
 async function addNewAdmin(req, res) {
   const { name, email, password } = req.body;
 
-  // Validate inputs
   if (!name || !email || !password) {
     return res
       .status(400)
       .json({ message: "All fields are required: name, email, and password." });
   }
 
-  // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res.status(400).json({ message: "Invalid email format." });
   }
 
-  // Validate password strength
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
   if (!passwordRegex.test(password)) {
     return res.status(400).json({
@@ -31,16 +28,13 @@ async function addNewAdmin(req, res) {
   }
 
   try {
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Check if email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "Email is already registered." });
     }
 
-    // Create and save the new user
     const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
     const transporter = nodemailer.createTransport({
@@ -49,14 +43,13 @@ async function addNewAdmin(req, res) {
         user: process.env.EMAIL,
         pass: process.env.EMAIL_PASSWORD,
       },
-      pool: true, // Use pooled connections
-      maxConnections: 1, // Limit concurrent connections
-      rateDelta: 15000, // Minimum time between messages
-      rateLimit: 5, // Maximum messages per rateDelta
-      secure: true, // Use TLS
+      pool: true,
+      maxConnections: 1,
+      rateDelta: 15000,
+      rateLimit: 5,
+      secure: true,
     });
 
-    // Email content
     const mailOptions = {
       from: `"Eco Map" <${process.env.EMAIL}>`,
       to: email,
@@ -103,7 +96,6 @@ async function addNewAdmin(req, res) {
           `,
     };
 
-    // Send the email
     const mail = await transporter.sendMail(mailOptions);
     console.log(mail);
 
@@ -156,7 +148,7 @@ async function getAdminDetails(req, res) {
 async function updateAdmin(req, res) {
   try {
     const { name, email, password } = req.body;
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
 
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
@@ -164,12 +156,10 @@ async function updateAdmin(req, res) {
 
     const updates = {};
 
-    // Validate and add name if provided
     if (name) {
       updates.name = name;
     }
 
-    // Validate email format if provided
     if (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
@@ -178,7 +168,6 @@ async function updateAdmin(req, res) {
       updates.email = email;
     }
 
-    // Validate and hash password if provided
     if (password) {
       const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
       if (!passwordRegex.test(password)) {
@@ -202,7 +191,7 @@ async function updateAdmin(req, res) {
             }
           }
         );
-        stream.end(req.file.buffer); // Send file buffer to Cloudinary
+        stream.end(req.file.buffer);
       });
 
       updates.profilepic = result.secure_url;
@@ -223,7 +212,6 @@ async function updateAdmin(req, res) {
   }
 }
 
-// Delete admin
 async function deleteAdmin(req, res) {
   const user = req.user;
   try {
@@ -244,7 +232,6 @@ async function forgotPassword(req, res) {
   try {
     const { email } = req.body;
 
-    // Validate email input
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
     }
@@ -252,15 +239,12 @@ async function forgotPassword(req, res) {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "Expert not found" });
 
-    // Generate OTP and expiration time
-    const otp = crypto.randomInt(100000, 999999); // 6-digit OTP
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+    const otp = crypto.randomInt(100000, 999999);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    // Save OTP in database
     await Otp.create({ email, otp, expiresAt });
     console.log(process.env.EMAIL_PASSWORD, process.env.EMAIL);
 
-    // Configure the mail transporter
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
@@ -269,7 +253,6 @@ async function forgotPassword(req, res) {
       },
     });
 
-    // Email content
     const mailOptions = {
       from: `"Eco Map" <${process.env.EMAIL}>`,
       to: email,
@@ -297,11 +280,9 @@ async function forgotPassword(req, res) {
       `,
     };
 
-    // Send the email
     const mail = await transporter.sendMail(mailOptions);
     console.log(mail);
 
-    // Respond with success message
     res.status(200).json({ message: "OTP sent to your email" });
   } catch (error) {
     console.error("Error in forgotPassword:", error);
@@ -321,7 +302,6 @@ async function verifyOtp(req, res) {
     return res.status(400).json({ message: "Invalid or expired OTP" });
   }
 
-  // OTP verified, generate reset token
   const resetToken = jwt.sign({ email }, process.env.JWT_SECRET, {
     expiresIn: "15m",
   });
@@ -339,7 +319,6 @@ async function resetPassword(req, res) {
     const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
     const email = decoded.email;
 
-    // Hash and update the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await User.updateOne({ email }, { password: hashedPassword });
 

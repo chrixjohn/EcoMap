@@ -6,11 +6,9 @@ const upload = require("../../models/uploadModel");
 
 const countAllDocuments = async (req, res) => {
   try {
-    // Ensure all models are properly imported
     const models = { User, occurrence, expert, species, upload };
     const counts = {};
 
-    // Iterate through models to count documents
     for (const [key, model] of Object.entries(models)) {
       try {
         counts[key] = await model.countDocuments();
@@ -20,7 +18,6 @@ const countAllDocuments = async (req, res) => {
       }
     }
 
-    // Return the results
     res.json(counts);
   } catch (error) {
     console.error("Unexpected error:", error.message);

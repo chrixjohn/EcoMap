@@ -10,7 +10,6 @@ const { log } = require("console");
 async function addNewUser(req, res) {
   const { name, email, password } = req.body;
 
-  // Validate inputs
   if (!name) {
     return res.status(401).json({ message: "Name is required." });
   }
@@ -23,13 +22,11 @@ async function addNewUser(req, res) {
     return res.status(401).json({ message: "Password is required." });
   }
 
-  // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res.status(401).json({ message: "Invalid email format." });
   }
 
-  // Validate password strength
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
   if (!passwordRegex.test(password)) {
     return res.status(401).json({
@@ -39,16 +36,13 @@ async function addNewUser(req, res) {
   }
 
   try {
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Check if email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(401).json({ message: "Email is already registered." });
     }
 
-    // Create and save the new user
     const newUser = new User({
       name,
       email,
@@ -119,7 +113,7 @@ async function getUserDetails(req, res) {
 async function updateUser(req, res) {
   try {
     const { name, email, password } = req.body;
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
 
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
@@ -127,12 +121,10 @@ async function updateUser(req, res) {
 
     const updates = {};
 
-    // Validate and add name if provided
     if (name) {
       updates.name = name;
     }
 
-    // Validate email format if provided
     if (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
@@ -141,7 +133,6 @@ async function updateUser(req, res) {
       updates.email = email;
     }
 
-    // Validate and hash password if provided
     if (password) {
       const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
       if (!passwordRegex.test(password)) {
@@ -154,7 +145,6 @@ async function updateUser(req, res) {
       updates.password = hashedPassword;
     }
 
-    // Update profile picture using Cloudinary if provided
     if (req.file) {
       const result = await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
@@ -167,7 +157,7 @@ async function updateUser(req, res) {
             }
           }
         );
-        stream.end(req.file.buffer); // Send file buffer to Cloudinary
+        stream.end(req.file.buffer);
       });
       updates.profilepic = result.secure_url;
     }
@@ -189,10 +179,9 @@ async function updateUser(req, res) {
   }
 }
 
-// Delete user
 async function deleteUser(req, res) {
   try {
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
     }
@@ -213,7 +202,6 @@ async function forgotPassword(req, res) {
   try {
     const { email } = req.body;
 
-    // Validate email input
     if (!email) {
       return res.status(401).json({ message: "Email is required" });
     }
@@ -221,15 +209,12 @@ async function forgotPassword(req, res) {
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ message: "User not found" });
 
-    // Generate OTP and expiration time
-    const otp = crypto.randomInt(100000, 999999); // 6-digit OTP
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+    const otp = crypto.randomInt(100000, 999999);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    // Save OTP in database
     await Otp.create({ email, otp, expiresAt });
     console.log(process.env.EMAIL_PASSWORD, process.env.EMAIL);
 
-    // Configure the mail transporter
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
@@ -238,7 +223,6 @@ async function forgotPassword(req, res) {
       },
     });
 
-    // Email content
     const mailOptions = {
       from: `"Eco Map" <${process.env.EMAIL}>`,
       to: email,
@@ -266,11 +250,9 @@ async function forgotPassword(req, res) {
       `,
     };
 
-    // Send the email
     const mail = await transporter.sendMail(mailOptions);
     console.log(mail);
 
-    // Respond with success message
     res.status(200).json({ message: "OTP sent to your email" });
   } catch (error) {
     console.error("Error in forgotPassword:", error);
@@ -290,7 +272,6 @@ async function verifyOtp(req, res) {
     return res.status(401).json({ message: "Invalid or expired OTP" });
   }
 
-  // OTP verified, generate reset token
   const resetToken = jwt.sign({ email }, process.env.JWT_SECRET, {
     expiresIn: "15m",
   });
@@ -308,7 +289,6 @@ async function resetPassword(req, res) {
     const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
     const email = decoded.email;
 
-    // Hash and update the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await User.updateOne({ email }, { password: hashedPassword });
 

@@ -10,11 +10,11 @@ const port = process.env.PORT || 3000;
 const mongoURI = process.env.MONGO_URI;
 
 app.use(cors());
-app.use(express.json()); // Middleware to parse JSON request body
+app.use(express.json());
 app.use(logger);
 
 app.use("/user", userRoutes);
-app.use("/expert", expertRoutes); // Use user routes under the '/api' path
+app.use("/expert", expertRoutes);
 app.use("/admin", adminRoutes);
 
 app.get("/status", (req, res) => {

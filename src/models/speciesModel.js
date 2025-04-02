@@ -13,15 +13,12 @@ speciesSchema.pre("findOneAndDelete", async function (next) {
   try {
     const species = await this.model.findOne(this.getQuery());
     if (species) {
-      // Find related occurrences
       const occurrences = await mongoose
         .model("Occurrence")
         .find({ speciesId: species._id });
 
-      // Extract spotIds from occurrences
       const spotIds = occurrences.map((occurrence) => occurrence.spotId);
 
-      // Update status of related uploads using spotIds
       await mongoose
         .model("Upload")
         .updateMany(
@@ -29,7 +26,6 @@ speciesSchema.pre("findOneAndDelete", async function (next) {
           { $set: { status: "archived" } }
         );
 
-      // Delete related occurrences
       await mongoose.model("Occurrence").deleteMany({ speciesId: species._id });
 
       // Delete the image from Cloudinary

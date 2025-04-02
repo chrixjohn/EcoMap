@@ -1,13 +1,12 @@
 const User = require("../../models/userModel");
 async function getUsers(req, res) {
   try {
-    // Fetch experts and select only the 'name' and 'email' fields
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
     }
-    const users = await User.find({ status: "approved" }).select("name email"); // Only return name and email where status is approved
-    res.status(200).json(users); // Send the experts as a JSON response
+    const users = await User.find({ status: "approved" }).select("name email");
+    res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: "Error fetching users", error });
   }
@@ -15,18 +14,17 @@ async function getUsers(req, res) {
 
 async function pendingUsers(req, res) {
   try {
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
     }
-    const users = await User.find({ status: "pending" }).select("name email"); // Only return name and email where status is pending
-    res.status(200).json(users); // Send the experts as a JSON response
+    const users = await User.find({ status: "pending" }).select("name email");
+    res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: "Error fetching users", error });
   }
 }
 
-// Function to approve a user
 async function approveUser(req, res) {
   const { id } = req.params;
 
@@ -45,7 +43,6 @@ async function approveUser(req, res) {
   }
 }
 
-// Function to reject a user
 async function rejectUser(req, res) {
   const { id } = req.params;
 
@@ -68,7 +65,7 @@ async function updateUser(req, res) {
   try {
     const { id } = req.params;
     const { name, email, password } = req.body;
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
 
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
@@ -76,12 +73,10 @@ async function updateUser(req, res) {
 
     const updates = {};
 
-    // Validate and add name if provided
     if (name) {
       updates.name = name;
     }
 
-    // Validate email format if provided
     if (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
@@ -90,7 +85,6 @@ async function updateUser(req, res) {
       updates.email = email;
     }
 
-    // Validate and hash password if provided
     if (password) {
       const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
       if (!passwordRegex.test(password)) {
@@ -118,11 +112,10 @@ async function updateUser(req, res) {
   }
 }
 
-// Delete user
 async function deleteUser(req, res) {
   try {
     const { id } = req.params;
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
     }

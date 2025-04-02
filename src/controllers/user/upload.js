@@ -1,16 +1,15 @@
 const cloudinary = require("../../config/cloudinary");
 const Upload = require("../../models/uploadModel");
 
-const fs = require("fs"); // To remove files after upload
+const fs = require("fs");
 
 async function uploadImage(req, res) {
   const { title, description } = req.body;
   const location = {
     type: req.body["location.type"],
-    coordinates: req.body["location.coordinates"].map(Number), // Convert to numbers
+    coordinates: req.body["location.coordinates"].map(Number),
   };
 
-  // Validate input
   if (!req.file) {
     return res.status(401).json({ error: "File is required" });
   }
@@ -24,26 +23,24 @@ async function uploadImage(req, res) {
   }
 
   try {
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
     }
 
-    // Upload file to Cloudinary directly from memory
     const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
-        { folder: "uploads" }, // Specify folder in Cloudinary
+        { folder: "uploads" },
         (error, result) => {
           if (error) reject(error);
           else resolve(result);
         }
       );
-      stream.end(req.file.buffer); // Pipe the buffer to Cloudinary
+      stream.end(req.file.buffer);
     });
 
-    // Create a new upload document in MongoDB
     const newUpload = new Upload({
-      image: result.secure_url, // Cloudinary URL
+      image: result.secure_url,
       title,
       description,
       location,
@@ -122,7 +119,7 @@ async function updateUpload(req, res) {
   try {
     const { id } = req.params;
     const { title, description } = req.body;
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
     }
@@ -142,11 +139,10 @@ async function updateUpload(req, res) {
   }
 }
 
-// Delete upload
 async function deleteUpload(req, res) {
   try {
     const { id } = req.params;
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
     }
@@ -161,7 +157,7 @@ async function deleteUpload(req, res) {
 }
 
 async function getUserUploads(req, res) {
-  const user = req.user; // Retrieved from middleware
+  const user = req.user;
   if (!user) {
     return res.status(401).json({ error: "Unauthorized." });
   }
@@ -181,7 +177,7 @@ async function getUploadHistory(req, res) {
       user: userId,
       status: { $in: ["approved", "declined"] },
     });
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
     }
@@ -199,12 +195,11 @@ async function getUploadHistory(req, res) {
   }
 }
 
-// Get pending uploads
 async function getPendingList(req, res) {
   try {
     const userId = req.user.id;
     const uploads = await Upload.find({ user: userId, status: "waiting" });
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
     }
@@ -221,11 +216,10 @@ async function getPendingList(req, res) {
   }
 }
 
-// Get full data of a pending upload
 async function getPendingData(req, res) {
   try {
     const { uploadID } = req.body;
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
     }

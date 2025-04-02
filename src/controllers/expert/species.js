@@ -16,9 +16,9 @@ async function getSpecies(req, res) {
     }
 
     if (sortBy === "asc") {
-      sortOption.common_name = 1; // A-Z
+      sortOption.common_name = 1;
     } else if (sortBy === "desc") {
-      sortOption.common_name = -1; // Z-A
+      sortOption.common_name = -1;
     }
 
     const species = await Species.find(query).sort(sortOption);
@@ -37,14 +37,14 @@ async function getSpecies(req, res) {
 
 async function getSpeciesById(req, res) {
   try {
-    const speciesId = req.params.id; // Get the species ID from the URL parameters
-    const species = await Species.findById(speciesId); // Find the species by ID
+    const speciesId = req.params.id;
+    const species = await Species.findById(speciesId);
 
     if (!species) {
       return res.status(404).json({ message: "Species not found" });
     }
 
-    res.json(species); // Return the species if found
+    res.json(species);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving species", error });
   }
@@ -63,13 +63,13 @@ async function addSpecies(req, res) {
   try {
     const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
-        { folder: "species" }, // Specify folder in Cloudinary
+        { folder: "species" },
         (error, result) => {
           if (error) reject(error);
           else resolve(result);
         }
       );
-      stream.end(req.file.buffer); // Pipe the buffer to Cloudinary
+      stream.end(req.file.buffer);
     });
     const newSpecies = new Species({
       common_name,

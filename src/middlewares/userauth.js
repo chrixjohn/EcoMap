@@ -8,7 +8,7 @@ async function userauth(req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Use the secret from .env
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
     if (decoded.role != "user") {
       return res.status(401).json({ message: "Unauthorized" });
@@ -18,8 +18,8 @@ async function userauth(req, res, next) {
         .status(401)
         .json({ message: "User not found please register" });
     }
-    req.user = decoded; // Attach decoded user data to the request object
-    next(); // Proceed to the next middleware or route handler
+    req.user = decoded;
+    next();
   } catch (error) {
     return res.status(403).json({ message: "Invalid token" });
   }

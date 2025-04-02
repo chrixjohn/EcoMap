@@ -27,13 +27,13 @@ async function addSpecies(req, res) {
   try {
     const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
-        { folder: "species" }, // Specify folder in Cloudinary
+        { folder: "species" },
         (error, result) => {
           if (error) reject(error);
           else resolve(result);
         }
       );
-      stream.end(req.file.buffer); // Pipe the buffer to Cloudinary
+      stream.end(req.file.buffer);
     });
     const newSpecies = new Species({
       common_name,
@@ -72,7 +72,6 @@ async function updateSpecies(req, res) {
   }
 }
 
-// Delete species
 async function deleteSpecies(req, res) {
   try {
     const { id } = req.params;

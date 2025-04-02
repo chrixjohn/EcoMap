@@ -1,8 +1,7 @@
 const multer = require("multer");
 //const path = require('path');
 
-// Use Multer for in-memory storage
-const storage = multer.memoryStorage(); // Store file in memory
+const storage = multer.memoryStorage();
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);

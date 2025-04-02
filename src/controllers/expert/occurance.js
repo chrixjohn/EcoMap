@@ -3,7 +3,7 @@ const Upload = require("../../models/uploadModel");
 const Species = require("../../models/speciesModel");
 
 async function getOccurrencesOfExpert(req, res) {
-  const user = req.user; // Retrieved from middleware
+  const user = req.user;
   if (!user) {
     return res.status(401).json({ error: "Unauthorized." });
   }
@@ -61,7 +61,6 @@ async function getOccurrence(req, res) {
       limit = 25,
     } = req.query;
 
-    // Convert page & limit to integers and enforce a max limit
     const parsedPage = parseInt(page) || 1;
     const parsedLimit = parseInt(limit) || 25;
     const maxLimit = 25;
@@ -69,7 +68,6 @@ async function getOccurrence(req, res) {
 
     const query = {};
 
-    // Apply date filters
     if (startDate || endDate) {
       query.createdAt = {};
       if (startDate) query.createdAt.$gte = new Date(startDate);
@@ -84,7 +82,6 @@ async function getOccurrence(req, res) {
       };
     }
 
-    // Sorting logic
     const sortOption = {};
     if (sortBy === "recent") {
       sortOption.createdAt = -1;
@@ -92,7 +89,6 @@ async function getOccurrence(req, res) {
       sortOption.createdAt = 1;
     }
 
-    // Fetch total count before applying pagination
     const totalItems = await Occurrence.countDocuments(query);
     console.log(totalItems);
     const totalPages = Math.ceil(totalItems / finalLimit);
@@ -107,7 +103,6 @@ async function getOccurrence(req, res) {
       });
     }
 
-    // Fetch paginated occurrences
     const occurrences = await Occurrence.find(query)
       .populate({
         path: "spotId",
@@ -122,17 +117,14 @@ async function getOccurrence(req, res) {
       .limit(finalLimit)
       .exec();
 
-    // Filter out occurrences where speciesId is null
     const filteredOccurrences = occurrences.filter((o) => o.speciesId !== null);
 
-    // If no matching occurrences are found
     if (filteredOccurrences.length === 0) {
       return res.status(200).json({
         message: "No occurrences found matching the criteria.",
       });
     }
 
-    // Return response with pagination info
     res.status(200).json({
       page: parsedPage,
       limit: finalLimit,
@@ -153,7 +145,7 @@ async function updateOccurrence(req, res) {
   try {
     const { id } = req.params;
     const updates = req.body;
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
     }
@@ -171,11 +163,10 @@ async function updateOccurrence(req, res) {
   }
 }
 
-// Delete occurrence
 async function deleteOccurrence(req, res) {
   try {
     const { id } = req.params;
-    const user = req.user; // Retrieved from middleware
+    const user = req.user;
     if (!user) {
       return res.status(401).json({ error: "Unauthorized." });
     }
